@@ -20,6 +20,7 @@ from bs4 import BeautifulSoup
 from collections import defaultdict
 from termcolor import colored
 from pathlib import Path
+import xml.etree.ElementTree as ET
 
 # Configuration
 CONFIG = {
