@@ -388,40 +388,97 @@ class CyberSentinel:
         })
         Printer.critical(f"Found {vuln['cve']} ({vuln['severity']}) - {service['service']}")
 
-    def _check_exploit_db(self, service):
-        try:
-            params = {
-                'q': f"{service['service']} {service['version']}",
-                'key': os.getenv('EXPLOIT_DB_KEY')
-            }
-            response = requests.get(CONFIG['exploit_db_api'], params=params, timeout=10)
-            return response.json().get('results', [])
-        except Exception as e:
-            Printer.warning(f"Exploit DB check failed: {str(e)}")
+def _check_exploit_db(self, service):
+    """Improved ExploitDB search using web scraping"""
+    try:
+        time.sleep(1)  # Respect rate limits
+        headers = {
+            'User-Agent': 'CyberGuardian/3.0 (+https://github.com/NikolisSecurity/CyberToolX)',
+            'Accept-Language': 'en-US,en;q=0.5'
+        }
+        
+        search_query = f"{service['service']} {service['version']}".strip()
+        params = {'q': search_query}
+        
+        response = requests.get(
+            'https://www.exploit-db.com/search',
+            params=params,
+            headers=headers,
+            timeout=15
+        )
+        
+        if response.status_code != 200:
+            Printer.warning(f"Exploit DB search failed (HTTP {response.status_code})")
             return []
 
-    def directory_enum(self, base_url):
-        try:
-            self.progress.update_dirs(0, len(self.common_dirs))
+        soup = BeautifulSoup(response.text, 'html.parser')
+        exploits = []
+        
+        for row in soup.select('table.table-exploits tr'):
+            cols = row.select('td')
+            if len(cols) >= 5:
+                try:
+                    exploit_id = cols[1].text.strip()
+                    description = cols[3].text.strip()
+                    url = f"https://www.exploit-db.com{cols[1].find('a')['href']}"
+                    exploits.append({
+                        'id': exploit_id,
+                        'description': description,
+                        'url': url
+                    })
+                except Exception as e:
+                    Printer.warning(f"Skipping invalid exploit row: {str(e)}")
+        
+        return exploits[:3]  # Return top 3 results
 
-            with ThreadPoolExecutor(max_workers=CONFIG['max_threads']) as executor:
-                futures = {executor.submit(self._check_dir, base_url, dir): dir
-                          for dir in self.common_dirs}
+    except Exception as e:
+        Printer.warning(f"Exploit DB check failed: {str(e)}")
+        return []
+        
+def directory_enum(self, base_url):
+    """Improved directory enumeration with accurate progress tracking"""
+    try:
+        total_dirs = len(self.common_dirs)
+        self.progress.update_dirs(0, total_dirs)
+        completed = 0
+        result_queue = Queue()
 
-                for i, future in enumerate(futures):
-                    self._check_status()
-                    try:
-                        result = future.result(timeout=5)
-                        if result:
-                            self.findings['directories'].append(result)
-                        self.progress.update_dirs(i+1, len(self.common_dirs))
-                    except:
-                        pass
+        def worker():
+            while True:
+                directory = dir_queue.get()
+                try:
+                    result = self._check_dir(base_url, directory)
+                    if result:
+                        result_queue.put(result)
+                finally:
+                    dir_queue.task_done()
 
-            Printer.success(f"Found {len(self.findings['directories'])} valid directories")
+        with ThreadPoolExecutor(max_workers=CONFIG['max_threads']) as executor:
+            dir_queue = Queue()
+            for dir in self.common_dirs:
+                dir_queue.put(dir)
+            
+            # Start worker threads
+            for _ in range(CONFIG['max_threads']):
+                executor.submit(worker)
+            
+            # Update progress
+            while completed < total_dirs:
+                self._check_status()
+                try:
+                    result = result_queue.get(timeout=1)
+                    if result:
+                        self.findings['directories'].append(result)
+                except:
+                    pass
+                finally:
+                    completed += 1
+                    self.progress.update_dirs(completed, total_dirs)
 
-        except Exception as e:
-            Printer.error(f"Directory enumeration failed: {str(e)}")
+        Printer.success(f"Found {len(self.findings['directories'])} valid directories")
+
+    except Exception as e:
+        Printer.error(f"Directory enumeration failed: {str(e)}")
 
     def _check_dir(self, base_url, directory):
         try:
