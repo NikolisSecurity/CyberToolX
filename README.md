@@ -12,7 +12,13 @@
 - Penetration testers  
 - System administrators  
 - Bug bounty hunters  
-- Security researchers  
+- Security researchers
+
+**:hammer_and_wrench: Installation**:
+```bash
+sudo apt install nmap git
+pip install -r requirements.txt
+```
 
 *Star :star: to support development | Contribute :tools: to enhance features*  
 
