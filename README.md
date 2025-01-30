@@ -32,6 +32,6 @@ python3 main.py example.com -m/--mode fast/deep -o/--ouput html/json
 python3 main.py -u/--update
 ```
 
-*Star :star: to support development | Contribute :tools: to enhance features*  
+*Star :star: to support development | Contribute :toolbox: to enhance features*  
 
 *(Python | Nmap | Exploit-DB | CVE Mitre integrated)*
