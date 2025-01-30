@@ -47,7 +47,7 @@ class SecurityArt:
        ╚═════╝   ╚═╝    ╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝
 
         ''', CONFIG['banner_color'])}
-        {colored('CyberGuardian Ultimate v1.0', CONFIG['highlight_color'], attrs=['bold'])}
+        {colored('CyberGuardian Ultimate v1.1', CONFIG['highlight_color'], attrs=['bold'])}
         {colored('#' * 65, CONFIG['highlight_color'])}
         """
 
