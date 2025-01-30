@@ -20,7 +20,7 @@ sudo apt install nmap git
 pip install -r requirements.txt
 ```
 
-**:8ball: Usage**:
+**:8ball: Basic Usage**:
 ```bash
 # Basic scan with HTML or JSON report
 python3 main.py example.com -o/--output html/json
