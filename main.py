@@ -85,11 +85,18 @@ class GitHubUpdater:
                 backup_dir = f"backup_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
                 os.makedirs(backup_dir, exist_ok=True)
 
-                # Copy modified files
-                modified_files = [line.split()[-1] for line in status_result.stdout.splitlines()]
-                for file in modified_files:
-                    if os.path.exists(file):
-                        shutil.copy(file, os.path.join(backup_dir, file))
+                # Copy modified files and directories properly
+                for line in status_result.stdout.splitlines():
+                    # Extract filename from git status output
+                    file_path = line[3:].strip()
+                    if os.path.exists(file_path):
+                        dest_path = os.path.join(backup_dir, file_path)
+                        os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+                        if os.path.isdir(file_path):
+                            shutil.copytree(file_path, dest_path, dirs_exist_ok=True)
+                        else:
+                            shutil.copy2(file_path, dest_path)
+
                 Printer.warning(f"Local changes backed up to {backup_dir}/")
 
                 # Reset to remote state
