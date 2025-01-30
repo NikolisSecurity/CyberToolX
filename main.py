@@ -12,9 +12,11 @@ import threading
 import time
 import subprocess
 import webbrowser
+import csv
 from queue import Queue
 from concurrent.futures import ThreadPoolExecutor
 from bs4 import BeautifulSoup
+from collections import defaultdict
 from termcolor import colored
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -43,9 +45,9 @@ class SecurityArt:
       ██║       ╚██╔╝  ██║   ██║██║   ██║██╔══██║██╔══██╗██║  ██║██║██╔══██║██║╚██╗██║
       ╚██████╗   ██║   ╚██████╔╝╚██████╔╝██║  ██║██║  ██║██████╔╝██║██║  ██║██║ ╚████║
        ╚═════╝   ╚═╝    ╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝
-                                                                                   
+
         ''', CONFIG['banner_color'])}
-        {colored('CyberGuardian Ultimate v3.0', CONFIG['highlight_color'], attrs=['bold'])}
+        {colored('CyberGuardian Ultimate v1.0', CONFIG['highlight_color'], attrs=['bold'])}
         {colored('#' * 65, CONFIG['highlight_color'])}
         """
 
@@ -98,12 +100,39 @@ class ThreatIntel:
     @staticmethod
     def download_resource(url, filename):
         try:
-            response = requests.get(url, timeout=10)
-            with open(filename, 'wb') as f:
-                f.write(response.content)
-            Printer.success(f"Downloaded {filename}")
+            response = requests.get(url, timeout=30)
+
+            if filename == 'cve_db.json':
+                # Parse CSV and convert to structured JSON
+                cve_data = defaultdict(list)
+                reader = csv.DictReader(response.text.splitlines(), delimiter=',')
+
+                for row in reader:
+                    if 'Name' in row:
+                        # Extract software name from CVE ID (e.g., "CVE-2020-1234|libvirt")
+                        parts = row['Name'].split('|')
+                        if len(parts) > 1:
+                            software = parts[1].lower().strip()
+                            cve_entry = {
+                                'cve': parts[0].strip(),
+                                'severity': row.get('Phase', 'N/A').strip(),
+                                'description': row.get('Description', 'No description').strip()
+                            }
+                            cve_data[software].append(cve_entry)
+
+                # Save as proper JSON
+                with open(filename, 'w', encoding='utf-8') as f:
+                    json.dump(cve_data, f, indent=2)
+
+            else:
+                # Handle other file types normally
+                with open(filename, 'wb') as f:
+                    f.write(response.content)
+
+            Printer.success(f"Processed {filename}")
+
         except Exception as e:
-            Printer.error(f"Failed to download {filename}: {str(e)}")
+            Printer.error(f"Failed to process {filename}: {str(e)}")
             sys.exit(1)
 
 class Printer:
@@ -178,7 +207,7 @@ class TargetResolver:
 
                 Printer.status(f"Resolved {target} to {len(ips)} IPs:")
                 for ip in ips:
-                    Printer.info(f"  {ip}")
+                    Printer.status(f"  {ip}")
                 return ips
             except Exception as e:
                 Printer.error(f"Resolution failed: {str(e)}")
@@ -224,10 +253,14 @@ class CyberSentinel:
             )
 
     def _load_databases(self):
-        with open('cve_db.json') as f:
-            self.cve_db = json.load(f)
-        with open('directories.txt') as f:
-            self.common_dirs = f.read().splitlines()
+        try:
+            with open('cve_db.json', 'r', encoding='utf-8') as f:
+                self.cve_db = json.load(f)
+            with open('directories.txt', 'r', encoding='utf-8') as f:
+                self.common_dirs = f.read().splitlines()
+        except Exception as e:
+            Printer.error(f"Database load failed: {str(e)}")
+            sys.exit(1)
 
     def scan_target(self, target, mode='fast'):
         self.findings['target'] = target
@@ -249,27 +282,28 @@ class CyberSentinel:
 
     def port_scan(self, ip, ports):
         try:
-            list_scan = self.nm.scan(ip, arguments='-sL')
-            if ip not in list_scan['scan']:
+            self.nm.scan(ip, ports, arguments='-sV --script vulners')
+
+            if ip not in self.nm.all_hosts():
                 raise ValueError("Target not in scan results")
 
-            port_list = list_scan['scan'][ip]['tcp'].keys()
+            host_data = self.nm[ip]
+            port_list = [port for proto in host_data.all_protocols()
+                       for port in host_data[proto].keys()]
+
             self.progress.update_ports(0, len(port_list))
 
-            scan_result = self.nm.scan(ip, ports, arguments='-sV --script vulners')
-
-            for i, host in enumerate(self.nm.all_hosts()):
+            for i, port in enumerate(port_list):
                 self._check_status()
-                for proto in self.nm[host].all_protocols():
-                    for port, data in self.nm[host][proto].items():
-                        service_info = {
-                            'ip': ip,
-                            'port': port,
-                            'service': f"{data['name']} {data.get('product', '')}",
-                            'version': data.get('version', ''),
-                            'protocol': proto
-                        }
-                        self.findings['ports'].append(service_info)
+                proto = 'tcp'  # Assuming TCP for simplicity
+                service_info = {
+                    'ip': ip,
+                    'port': port,
+                    'service': f"{host_data[proto][port]['name']} {host_data[proto][port].get('product', '')}",
+                    'version': host_data[proto][port].get('version', ''),
+                    'protocol': proto
+                }
+                self.findings['ports'].append(service_info)
                 self.progress.update_ports(i+1, len(port_list))
 
             Printer.success(f"Port scan completed for {ip}")
@@ -283,13 +317,11 @@ class CyberSentinel:
                 if service['ip'] != ip:
                     continue
 
-                # Check local CVE database
                 base_service = service['service'].split()[0].lower()
                 if base_service in self.cve_db:
                     for vuln in self.cve_db[base_service]:
                         self._add_vulnerability(service, vuln)
 
-                # Check Exploit-DB
                 exploits = self._check_exploit_db(service)
                 for exploit in exploits:
                     self.findings['exploits'].append({
@@ -349,9 +381,9 @@ class CyberSentinel:
 
     def _check_dir(self, base_url, directory):
         try:
-            url = f"{base_url}/{directory}"
+            url = f"{base_url.rstrip('/')}/{directory.lstrip('/')}"
             response = requests.get(url, timeout=3, allow_redirects=False)
-            if response.status_code == 200:
+            if response.status_code in [200, 301, 302, 403]:
                 return {'url': url, 'status': response.status_code}
         except:
             return None
@@ -374,55 +406,65 @@ class CyberSentinel:
             return None
 
     def _generate_html_report(self, filename):
-        with open(filename, 'w') as f:
+        with open(filename, 'w', encoding='utf-8') as f:
             f.write(f"""
             <html>
                 <head>
                     <title>CyberGuardian Report - {self.findings['target']}</title>
                     <style>
-                        body {{ font-family: monospace; padding: 20px; }}
-                        .vulnerability {{ color: red; font-weight: bold; }}
-                        .exploit {{ color: darkorange; }}
-                        .ip {{ color: blue; }}
+                        body {{ font-family: Arial, sans-serif; padding: 20px; }}
+                        .vulnerability {{ color: #dc3545; font-weight: bold; }}
+                        .exploit {{ color: #ff6a00; }}
+                        .ip {{ color: #0d6efd; }}
+                        a {{ color: #0d6efd; text-decoration: none; }}
+                        a:hover {{ text-decoration: underline; }}
                     </style>
                 </head>
                 <body>
                     <h1>Security Report for {self.findings['target']}</h1>
-                    <h2>Scan ID: {self.session_id}</h2>
+                    <h3>Scan ID: {self.session_id}</h3>
 
+                    <h2>Network Discovery</h2>
                     <h3>Resolved IP Addresses</h3>
                     <ul>
                         {"".join(f"<li class='ip'>{ip}</li>" for ip in self.findings['ips'])}
                     </ul>
 
-                    <h3>Discovered Services</h3>
+                    <h3>Open Ports & Services</h3>
                     <ul>
                         {"".join(
-                            f"<li>{service['ip']}:{service['port']} - {service['service']}</li>"
+                            f"<li><b>{service['ip']}:{service['port']}</b> - {service['service']} "
+                            f"(v{service['version']})</li>"
                             for service in self.findings['ports']
                         )}
                     </ul>
 
-                    <h3>Vulnerabilities Found</h3>
+                    <h2>Security Findings</h2>
+                    <h3>Vulnerabilities ({len(self.findings['vulnerabilities'])})</h3>
                     <ul>
                         {"".join(
-                            f"<li class='vulnerability'>{vuln['cve']} ({vuln['severity']}): {vuln['description']}</li>"
+                            f"<li class='vulnerability'>{vuln['cve']} ({vuln['severity']})<br>"
+                            f"<small>{vuln['description']}</small><br>"
+                            f"<i>Affected service: {vuln['service']} on {vuln['ip']}:{vuln['port']}</i></li>"
                             for vuln in self.findings['vulnerabilities']
                         )}
                     </ul>
 
-                    <h3>Potential Exploits</h3>
+                    <h3>Potential Exploits ({len(self.findings['exploits'])})</h3>
                     <ul>
                         {"".join(
-                            f"<li class='exploit'><a href='{exploit['url']}'>{exploit['exploit_id']}</a>: {exploit['description']}</li>"
+                            f"<li class='exploit'><a href='{exploit['url']}' target='_blank'>"
+                            f"Exploit {exploit['exploit_id']}</a>: {exploit['description']}<br>"
+                            f"<i>Target service: {exploit['service']}</i></li>"
                             for exploit in self.findings['exploits']
                         )}
                     </ul>
 
-                    <h3>Discovered Directories</h3>
+                    <h2>Web Directory Discovery ({len(self.findings['directories'])})</h2>
                     <ul>
                         {"".join(
-                            f"<li><a href='{dir['url']}'>{dir['url']}</a> ({dir['status']})</li>"
+                            f"<li><a href='{dir['url']}' target='_blank'>{dir['url']}</a> "
+                            f"(HTTP {dir['status']})</li>"
                             for dir in self.findings['directories']
                         )}
                     </ul>
