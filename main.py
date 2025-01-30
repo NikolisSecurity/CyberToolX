@@ -490,6 +490,7 @@ def directory_enum(self, base_url):
             return None
 
     def generate_report(self, format='html'):
+        """Generate scan report in specified format"""
         try:
             report_file = f"reports/scan_{self.session_id}.{format}"
 
