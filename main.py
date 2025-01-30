@@ -24,7 +24,7 @@ CONFIG = {
     'cve_db_url': 'https://cve.mitre.org/data/downloads/allitems.csv',
     'dir_list_url': 'https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/common.txt',
     'exploit_db_api': 'https://exploit-db.com/search',
-    'github_repo': 'https://github.com/NikolisSecurity/CyberToolX',
+    'github_repo': 'https://github.com/NikolisSecurity/CyberToolX.git',
     'update_check_interval': 3600,
     'banner_color': 'cyan',
     'highlight_color': 'yellow',
