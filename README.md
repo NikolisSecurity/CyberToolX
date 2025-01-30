@@ -20,6 +20,18 @@ sudo apt install nmap git
 pip install -r requirements.txt
 ```
 
+**:8ball: Usage**:
+```bash
+# Basic scan with HTML or JSON report
+python3 main.py example.com -o/--output html/json
+
+# Deep scan with HTML or JSON report
+python3 main.py example.com -m/--mode fast/deep -o/--ouput html/json
+
+# Force update check
+python3 main.py -u/--update
+```
+
 *Star :star: to support development | Contribute :tools: to enhance features*  
 
 *(Python | Nmap | Exploit-DB | CVE Mitre integrated)*
