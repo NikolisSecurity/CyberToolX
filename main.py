@@ -13,12 +13,12 @@ import time
 import subprocess
 import webbrowser
 import csv
+import io
 from queue import Queue
 from concurrent.futures import ThreadPoolExecutor
 from bs4 import BeautifulSoup
 from collections import defaultdict
 from termcolor import colored
-import xml.etree.ElementTree as ET
 from pathlib import Path
 
 # Configuration
@@ -45,39 +45,68 @@ class SecurityArt:
       ██║       ╚██╔╝  ██║   ██║██║   ██║██╔══██║██╔══██╗██║  ██║██║██╔══██║██║╚██╗██║
       ╚██████╗   ██║   ╚██████╔╝╚██████╔╝██║  ██║██║  ██║██████╔╝██║██║  ██║██║ ╚████║
        ╚═════╝   ╚═╝    ╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝
-
+                                                                                   
         ''', CONFIG['banner_color'])}
-        {colored('CyberGuardian Ultimate v1.1', CONFIG['highlight_color'], attrs=['bold'])}
+        {colored('CyberGuardian Ultimate v3.0', CONFIG['highlight_color'], attrs=['bold'])}
         {colored('#' * 65, CONFIG['highlight_color'])}
         """
 
 class GitHubUpdater:
     @staticmethod
     def check_update():
-        """Check and apply updates from GitHub repository"""
+        """Check and apply updates from GitHub repository with conflict resolution"""
         try:
             if not os.path.exists('.git'):
                 Printer.warning("Auto-update disabled (not a git repo)")
                 return False
 
-            result = subprocess.run(['git', 'fetch', 'origin'],
-                                  capture_output=True, text=True)
-            if result.returncode != 0:
-                raise Exception(result.stderr)
+            # Check remote status
+            fetch_result = subprocess.run(['git', 'fetch', 'origin'],
+                                        capture_output=True, text=True)
+            if fetch_result.returncode != 0:
+                raise Exception(fetch_result.stderr)
 
+            # Get commit hashes
             local_hash = subprocess.check_output(['git', 'rev-parse', 'HEAD']).decode().strip()
             remote_hash = subprocess.check_output(['git', 'rev-parse', 'origin/main']).decode().strip()
 
-            if local_hash != remote_hash:
-                Printer.success(f"New version available ({remote_hash[:7]})")
-                result = subprocess.run(['git', 'pull', '--ff-only', 'origin', 'main'],
-                                      capture_output=True, text=True)
-                if result.returncode == 0:
-                    Printer.success("Update successful! Restart required")
-                    return True
-                else:
-                    raise Exception(result.stderr)
-            return False
+            if local_hash == remote_hash:
+                return False
+
+            Printer.success(f"New version available ({remote_hash[:7]})")
+
+            # Check for local modifications
+            status_result = subprocess.run(['git', 'status', '--porcelain'],
+                                         capture_output=True, text=True)
+            has_changes = bool(status_result.stdout.strip())
+
+            if has_changes:
+                # Create backup of modified files
+                backup_dir = f"backup_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
+                os.makedirs(backup_dir, exist_ok=True)
+
+                # Copy modified files
+                modified_files = [line.split()[-1] for line in status_result.stdout.splitlines()]
+                for file in modified_files:
+                    if os.path.exists(file):
+                        shutil.copy(file, os.path.join(backup_dir, file))
+                Printer.warning(f"Local changes backed up to {backup_dir}/")
+
+                # Reset to remote state
+                reset_result = subprocess.run(['git', 'reset', '--hard', 'origin/main'],
+                                            capture_output=True, text=True)
+                if reset_result.returncode != 0:
+                    raise Exception(reset_result.stderr)
+            else:
+                # Regular fast-forward merge
+                pull_result = subprocess.run(['git', 'pull', '--ff-only', 'origin', 'main'],
+                                           capture_output=True, text=True)
+                if pull_result.returncode != 0:
+                    raise Exception(pull_result.stderr)
+
+            Printer.success("Update successful! Restart required")
+            return True
+
         except Exception as e:
             Printer.error(f"Update failed: {str(e)}")
             return False
@@ -100,32 +129,39 @@ class ThreatIntel:
     @staticmethod
     def download_resource(url, filename):
         try:
-            response = requests.get(url, timeout=30)
-
+            response = requests.get(url, timeout=30, stream=True)
+            
             if filename == 'cve_db.json':
-                # Parse CSV and convert to structured JSON
+                # Handle CSV-to-JSON conversion with proper encoding
                 cve_data = defaultdict(list)
-                reader = csv.DictReader(response.text.splitlines(), delimiter=',')
+                
+                # Decode content using latin-1 to handle all byte values
+                content = response.content.decode('latin-1')
+                reader = csv.DictReader(io.StringIO(content), delimiter=',')
 
                 for row in reader:
-                    if 'Name' in row:
-                        # Extract software name from CVE ID (e.g., "CVE-2020-1234|libvirt")
-                        parts = row['Name'].split('|')
-                        if len(parts) > 1:
-                            software = parts[1].lower().strip()
-                            cve_entry = {
-                                'cve': parts[0].strip(),
-                                'severity': row.get('Phase', 'N/A').strip(),
-                                'description': row.get('Description', 'No description').strip()
-                            }
-                            cve_data[software].append(cve_entry)
+                    try:
+                        if 'Name' in row and row['Name']:
+                            parts = row['Name'].split('|')
+                            if len(parts) > 1:
+                                software = parts[1].lower().strip()
+                                cve_entry = {
+                                    'cve': parts[0].strip(),
+                                    'severity': row.get('Phase', 'N/A').strip(),
+                                    'description': row.get('Description', 'No description')
+                                        .encode('latin-1').decode('utf-8', 'ignore').strip()
+                                }
+                                cve_data[software].append(cve_entry)
+                    except UnicodeDecodeError as ude:
+                        Printer.warning(f"Skipping row with invalid characters: {str(ude)}")
+                        continue
 
-                # Save as proper JSON
+                # Save with UTF-8 encoding and ensure_ascii=False
                 with open(filename, 'w', encoding='utf-8') as f:
-                    json.dump(cve_data, f, indent=2)
+                    json.dump(cve_data, f, indent=2, ensure_ascii=False)
 
             else:
-                # Handle other file types normally
+                # Handle other files with UTF-8 encoding
                 with open(filename, 'wb') as f:
                     f.write(response.content)
 
@@ -254,10 +290,18 @@ class CyberSentinel:
 
     def _load_databases(self):
         try:
+            # Load JSON with mixed encoding support
             with open('cve_db.json', 'r', encoding='utf-8') as f:
                 self.cve_db = json.load(f)
-            with open('directories.txt', 'r', encoding='utf-8') as f:
-                self.common_dirs = f.read().splitlines()
+            
+            # Load directories with UTF-8 and fallback to latin-1
+            try:
+                with open('directories.txt', 'r', encoding='utf-8') as f:
+                    self.common_dirs = f.read().splitlines()
+            except UnicodeDecodeError:
+                with open('directories.txt', 'r', encoding='latin-1') as f:
+                    self.common_dirs = f.read().splitlines()
+
         except Exception as e:
             Printer.error(f"Database load failed: {str(e)}")
             sys.exit(1)
@@ -283,14 +327,14 @@ class CyberSentinel:
     def port_scan(self, ip, ports):
         try:
             self.nm.scan(ip, ports, arguments='-sV --script vulners')
-
+            
             if ip not in self.nm.all_hosts():
                 raise ValueError("Target not in scan results")
 
             host_data = self.nm[ip]
-            port_list = [port for proto in host_data.all_protocols()
+            port_list = [port for proto in host_data.all_protocols() 
                        for port in host_data[proto].keys()]
-
+            
             self.progress.update_ports(0, len(port_list))
 
             for i, port in enumerate(port_list):
@@ -418,6 +462,8 @@ class CyberSentinel:
                         .ip {{ color: #0d6efd; }}
                         a {{ color: #0d6efd; text-decoration: none; }}
                         a:hover {{ text-decoration: underline; }}
+                        ul {{ list-style-type: none; padding-left: 20px; }}
+                        li {{ margin-bottom: 10px; }}
                     </style>
                 </head>
                 <body>
