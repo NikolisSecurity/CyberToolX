@@ -263,6 +263,7 @@ class CyberSentinel:
         }
         self.progress = ScanProgress()
         self.input_queue = Queue()
+        self.scan_active = False
 
         ThreatIntel.initialize_environment()
         self._load_databases()
@@ -275,18 +276,21 @@ class CyberSentinel:
         def input_listener():
             while True:
                 input()
-                self.input_queue.put("status")
+                if self.scan_active:
+                    self._check_status(force=True)
         threading.Thread(target=input_listener, daemon=True).start()
 
-    def _check_status(self):
-        while not self.input_queue.empty():
-            self.input_queue.get()
-            progress = self.progress.get_progress()
-            Printer.status(
-                f"Progress [Ports: {progress['ports']} | "
-                f"Dirs: {progress['directories']} | "
-                f"Elapsed: {progress['elapsed']}]"
-            )
+    def _check_status(self, force=False):
+        progress = self.progress.get_progress()
+        status_msg = (
+            f"Progress [Ports: {progress['ports']} | "
+            f"Dirs: {progress['directories']} | "
+            f"Elapsed: {progress['elapsed']}]"
+        )
+
+        sys.stdout.write('\033[2K\033[1G')
+        sys.stdout.write(status_msg + '\n')
+        sys.stdout.flush()
 
     def _load_databases(self):
         try:
@@ -326,7 +330,16 @@ class CyberSentinel:
 
     def port_scan(self, ip, ports):
         try:
-            self.nm.scan(ip, ports, arguments='-sV --script vulners')
+            self.nm.scan(ip, ports, arguments='-sV -sC')
+
+            prev_progress = 0
+            while not self.nm.still_scanning():
+                current_progress = int(self.nm.progress())
+                if current_progress != prev_progress:
+                    self.progress.update_ports(current_progress, 100)
+                    self._check_status()
+                    prev_progress = current_progress
+                time.sleep(0.5)
             
             if ip not in self.nm.all_hosts():
                 raise ValueError("Target not in scan results")
@@ -354,6 +367,8 @@ class CyberSentinel:
 
         except Exception as e:
             Printer.error(f"Port scan failed: {str(e)}")
+        finally:
+            self.scan_active = False
 
     def vulnerability_assessment(self, ip):
         try:
@@ -435,50 +450,41 @@ def _check_exploit_db(self, service):
         Printer.warning(f"Exploit DB check failed: {str(e)}")
         return []
         
-def directory_enum(self, base_url):
-    """Improved directory enumeration with accurate progress tracking"""
-    try:
-        total_dirs = len(self.common_dirs)
-        self.progress.update_dirs(0, total_dirs)
-        completed = 0
-        result_queue = Queue()
-
-        def worker():
-            while True:
-                directory = dir_queue.get()
-                try:
-                    result = self._check_dir(base_url, directory)
-                    if result:
-                        result_queue.put(result)
-                finally:
-                    dir_queue.task_done()
-
-        with ThreadPoolExecutor(max_workers=CONFIG['max_threads']) as executor:
-            dir_queue = Queue()
-            for dir in self.common_dirs:
-                dir_queue.put(dir)
+    def directory_enum(self, base_url):
+        try:
+            self.scan_active = True
+            total_dirs = len(self.common_dirs)
+            self.progress.update_dirs(0, total_dirs)
+            completed = 0
             
-            # Start worker threads
-            for _ in range(CONFIG['max_threads']):
-                executor.submit(worker)
+            with ThreadPoolExecutor(max_workers=CONFIG['max_threads']) as executor:
+                futures = {executor.submit(self._check_dir, base_url, dir): dir 
+                          for dir in self.common_dirs}
+                
+                while completed < total_dirs:
+                    done, _ = concurrent.futures.wait(
+                        futures, 
+                        timeout=1,
+                        return_when=concurrent.futures.FIRST_COMPLETED
+                    )
+                    
+                    for future in done:
+                        try:
+                            result = future.result()
+                            if result:
+                                self.findings['directories'].append(result)
+                        except:
+                            pass
+                        completed += 1
+                        self.progress.update_dirs(completed, total_dirs)
+                        del futures[future]
+                    
+                    # Update status on each iteration
+                    self._check_status()
             
-            # Update progress
-            while completed < total_dirs:
-                self._check_status()
-                try:
-                    result = result_queue.get(timeout=1)
-                    if result:
-                        self.findings['directories'].append(result)
-                except:
-                    pass
-                finally:
-                    completed += 1
-                    self.progress.update_dirs(completed, total_dirs)
-
-        Printer.success(f"Found {len(self.findings['directories'])} valid directories")
-
-    except Exception as e:
-        Printer.error(f"Directory enumeration failed: {str(e)}")
+            Printer.success(f"Found {len(self.findings['directories'])} valid directories")
+        finally:
+            self.scan_active = False
 
     def _check_dir(self, base_url, directory):
         try:
