@@ -442,53 +442,53 @@ class CyberSentinel:
         })
         Printer.critical(f"Found {vuln['cve']} ({vuln['severity']}) - {service['service']}")
 
-def _check_exploit_db(self, service):
-    """Improved ExploitDB search using web scraping"""
-    try:
-        time.sleep(1)  # Respect rate limits
-        headers = {
-            'User-Agent': 'CyberGuardian/3.0 (+https://github.com/NikolisSecurity/CyberToolX)',
-            'Accept-Language': 'en-US,en;q=0.5'
-        }
-        
-        search_query = f"{service['service']} {service['version']}".strip()
-        params = {'q': search_query}
-        
-        response = requests.get(
-            'https://www.exploit-db.com/search',
-            params=params,
-            headers=headers,
-            timeout=15
-        )
-        
-        if response.status_code != 200:
-            Printer.warning(f"Exploit DB search failed (HTTP {response.status_code})")
+    def _check_exploit_db(self, service):
+        """Improved ExploitDB search using web scraping"""
+        try:
+            time.sleep(1)  # Respect rate limits
+            headers = {
+                'User-Agent': 'CyberGuardian/3.0 (+https://github.com/NikolisSecurity/CyberToolX)',
+                'Accept-Language': 'en-US,en;q=0.5'
+            }
+            
+            search_query = f"{service['service']} {service['version']}".strip()
+            params = {'q': search_query}
+            
+            response = requests.get(
+                'https://www.exploit-db.com/search',
+                params=params,
+                headers=headers,
+                timeout=15
+            )
+            
+            if response.status_code != 200:
+                Printer.warning(f"Exploit DB search failed (HTTP {response.status_code})")
+                return []
+
+            soup = BeautifulSoup(response.text, 'html.parser')
+            exploits = []
+            
+            for row in soup.select('table.table-exploits tr'):
+                cols = row.select('td')
+                if len(cols) >= 5:
+                    try:
+                        exploit_id = cols[1].text.strip()
+                        description = cols[3].text.strip()
+                        url = f"https://www.exploit-db.com{cols[1].find('a')['href']}"
+                        exploits.append({
+                            'id': exploit_id,
+                            'description': description,
+                            'url': url
+                        })
+                    except Exception as e:
+                        Printer.warning(f"Skipping invalid exploit row: {str(e)}")
+            
+            return exploits[:3]  # Return top 3 results
+
+        except Exception as e:
+            Printer.warning(f"Exploit DB check failed: {str(e)}")
             return []
-
-        soup = BeautifulSoup(response.text, 'html.parser')
-        exploits = []
-        
-        for row in soup.select('table.table-exploits tr'):
-            cols = row.select('td')
-            if len(cols) >= 5:
-                try:
-                    exploit_id = cols[1].text.strip()
-                    description = cols[3].text.strip()
-                    url = f"https://www.exploit-db.com{cols[1].find('a')['href']}"
-                    exploits.append({
-                        'id': exploit_id,
-                        'description': description,
-                        'url': url
-                    })
-                except Exception as e:
-                    Printer.warning(f"Skipping invalid exploit row: {str(e)}")
-        
-        return exploits[:3]  # Return top 3 results
-
-    except Exception as e:
-        Printer.warning(f"Exploit DB check failed: {str(e)}")
-        return []
-        
+            
     def directory_enum(self, base_url):
         try:
             self.scan_active = True
