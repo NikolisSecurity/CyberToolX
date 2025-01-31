@@ -335,79 +335,80 @@ class CyberSentinel:
         if target.startswith('http'):
             self.directory_enum(target)
 
-def port_scan(self, ip, ports):
-    try:
-        self.scan_active = True
-        Printer.status(f"Starting port scan on {ip} ({ports})")
-        
-        # Configure scan parameters
-        scan_args = '-sS -sV -T4 --open --script vulners'
-        scanner = self.nm.scan(ip, ports, arguments=scan_args)
-        
-        # Real-time progress tracking using XML output
-        start_time = time.time()
-        last_progress = 0
-        
-        while True:
-            try:
-                # Get raw XML output
-                xml_output = self.nm.get_nmap_last_output()
-                if not xml_output:
-                    break
-                    
-                root = ET.fromstring(xml_output)
-                progress = root.find(".//taskprogress")
-                
-                if progress is not None:
-                    current_progress = float(progress.get('percent', '0'))
-                    elapsed = time.time() - start_time
-                    
-                    # Update progress if changed
-                    if current_progress != last_progress:
-                        self.progress.update_ports(current_progress, 100)
-                        self._check_status()
-                        last_progress = current_progress
-                        
-                    # Check completion
-                    if current_progress >= 100.0:
+    def port_scan(self, ip, ports):
+        """Fixed port scan method with proper indentation"""
+        try:
+            self.scan_active = True
+            Printer.status(f"Starting port scan on {ip} ({ports})")
+            
+            # Configure scan parameters
+            scan_args = '-sS -sV -T4 --open --script vulners'
+            self.nm.scan(ip, ports, arguments=scan_args)
+            
+            # Real-time progress tracking using XML output
+            start_time = time.time()
+            last_progress = 0
+            
+            while True:
+                try:
+                    # Get raw XML output
+                    xml_output = self.nm.get_nmap_last_output()
+                    if not xml_output:
                         break
                         
-                time.sleep(0.5)
-                
-            except (ET.ParseError, AttributeError):
-                break
-            except KeyboardInterrupt:
-                Printer.warning("Port scan interrupted by user")
-                return
+                    root = ET.fromstring(xml_output)
+                    progress = root.find(".//taskprogress")
+                    
+                    if progress is not None:
+                        current_progress = float(progress.get('percent', '0'))
+                        elapsed = time.time() - start_time
+                        
+                        # Update progress if changed
+                        if current_progress != last_progress:
+                            self.progress.update_ports(current_progress, 100)
+                            self._check_status()
+                            last_progress = current_progress
+                            
+                        # Check completion
+                        if current_progress >= 100.0:
+                            break
+                            
+                    time.sleep(0.5)
+                    
+                except (ET.ParseError, AttributeError):
+                    break
+                except KeyboardInterrupt:
+                    Printer.warning("Port scan interrupted by user")
+                    return
 
-        # Process results
-        if ip not in self.nm.all_hosts():
-            raise ValueError("Target not in scan results")
+            # Process results
+            if ip not in self.nm.all_hosts():
+                raise ValueError("Target not in scan results")
 
-        host_data = self.nm[ip]
-        open_ports = []
-        
-        for proto in host_data.all_protocols():
-            ports = host_data[proto].keys()
-            for port in ports:
-                service = host_data[proto][port]
-                open_ports.append({
-                    'port': port,
-                    'protocol': proto,
-                    'service': f"{service['name']} {service.get('product', '')}",
-                    'version': service.get('version', ''),
-                    'state': service['state']
-                })
+            host_data = self.nm[ip]
+            open_ports = []
+            
+            for proto in host_data.all_protocols():
+                ports = host_data[proto].keys()
+                for port in ports:
+                    service = host_data[proto][port]
+                    open_ports.append({
+                        'port': port,
+                        'protocol': proto,
+                        'service': f"{service['name']} {service.get('product', '')}",
+                        'version': service.get('version', ''),
+                        'state': service['state']
+                    })
 
-        # Update findings
-        self.findings['ports'].extend(open_ports)
-        Printer.success(f"Port scan completed for {ip} (Found {len(open_ports)} open ports)")
+            # Update findings
+            self.findings['ports'].extend(open_ports)
+            Printer.success(f"Port scan completed for {ip} (Found {len(open_ports)} open ports)")
 
-    except Exception as e:
-        Printer.error(f"Port scan failed: {str(e)}")
-    finally:
-        self.scan_active = False
-
+        except Exception as e:
+            Printer.error(f"Port scan failed: {str(e)}")
+        finally:
+            self.scan_active = False
+            
     def vulnerability_assessment(self, ip):
         try:
             for service in self.findings['ports']:
