@@ -11,9 +11,9 @@ import shutil
 import threading
 import time
 import subprocess
-import webbrowser
 import csv
 import io
+import concurrent.futures
 from queue import Queue
 from concurrent.futures import ThreadPoolExecutor
 from bs4 import BeautifulSoup
@@ -21,6 +21,7 @@ from collections import defaultdict
 from termcolor import colored
 from pathlib import Path
 import xml.etree.ElementTree as ET
+from html import escape
 
 # Configuration
 CONFIG = {
@@ -48,7 +49,7 @@ class SecurityArt:
        ╚═════╝   ╚═╝    ╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝
                                                                                    
         ''', CONFIG['banner_color'])}
-        {colored('CyberGuardian Ultimate v1.1', CONFIG['highlight_color'], attrs=['bold'])}
+        {colored('CyberGuardian Ultimate v1.2', CONFIG['highlight_color'], attrs=['bold'])}
         """
 
 class GitHubUpdater:
@@ -336,7 +337,7 @@ class CyberSentinel:
             self.directory_enum(target)
 
     def port_scan(self, ip, ports):
-        """Fixed port scan method with proper indentation"""
+        """Perform port scan with improved progress tracking"""
         try:
             self.scan_active = True
             Printer.status(f"Starting port scan on {ip} ({ports})")
@@ -345,41 +346,13 @@ class CyberSentinel:
             scan_args = '-sS -sV -T4 --open --script vulners'
             self.nm.scan(ip, ports, arguments=scan_args)
             
-            # Real-time progress tracking using XML output
+            # Track scan progress using elapsed time
             start_time = time.time()
-            last_progress = 0
-            
-            while True:
-                try:
-                    # Get raw XML output
-                    xml_output = self.nm.get_nmap_last_output()
-                    if not xml_output:
-                        break
-                        
-                    root = ET.fromstring(xml_output)
-                    progress = root.find(".//taskprogress")
-                    
-                    if progress is not None:
-                        current_progress = float(progress.get('percent', '0'))
-                        elapsed = time.time() - start_time
-                        
-                        # Update progress if changed
-                        if current_progress != last_progress:
-                            self.progress.update_ports(current_progress, 100)
-                            self._check_status()
-                            last_progress = current_progress
-                            
-                        # Check completion
-                        if current_progress >= 100.0:
-                            break
-                            
-                    time.sleep(0.5)
-                    
-                except (ET.ParseError, AttributeError):
-                    break
-                except KeyboardInterrupt:
-                    Printer.warning("Port scan interrupted by user")
-                    return
+            while self.nm.still_scanning():
+                elapsed = time.time() - start_time
+                self.progress.update_ports(int(elapsed), 100)  # Approximate progress
+                self._check_status()
+                time.sleep(1)
 
             # Process results
             if ip not in self.nm.all_hosts():
@@ -393,9 +366,10 @@ class CyberSentinel:
                 for port in ports:
                     service = host_data[proto][port]
                     open_ports.append({
+                        'ip': ip,
                         'port': port,
                         'protocol': proto,
-                        'service': f"{service['name']} {service.get('product', '')}",
+                        'service': f"{service['name']} {service.get('product', '')}".strip(),
                         'version': service.get('version', ''),
                         'state': service['state']
                     })
@@ -443,7 +417,7 @@ class CyberSentinel:
         Printer.critical(f"Found {vuln['cve']} ({vuln['severity']}) - {service['service']}")
 
     def _check_exploit_db(self, service):
-        """Improved ExploitDB search using web scraping"""
+        """Improved ExploitDB search with error handling"""
         try:
             time.sleep(1)  # Respect rate limits
             headers = {
@@ -472,9 +446,14 @@ class CyberSentinel:
                 cols = row.select('td')
                 if len(cols) >= 5:
                     try:
-                        exploit_id = cols[1].text.strip()
-                        description = cols[3].text.strip()
-                        url = f"https://www.exploit-db.com{cols[1].find('a')['href']}"
+                        exploit_id_elem = cols[1].find('a')
+                        description_elem = cols[3] if len(cols) > 3 else None
+                        if not exploit_id_elem or not description_elem:
+                            continue
+                            
+                        exploit_id = exploit_id_elem.text.strip()
+                        description = description_elem.text.strip()
+                        url = f"https://www.exploit-db.com{exploit_id_elem['href']}"
                         exploits.append({
                             'id': exploit_id,
                             'description': description,
@@ -494,34 +473,26 @@ class CyberSentinel:
             self.scan_active = True
             total_dirs = len(self.common_dirs)
             self.progress.update_dirs(0, total_dirs)
-            completed = 0
             
             with ThreadPoolExecutor(max_workers=CONFIG['max_threads']) as executor:
                 futures = {executor.submit(self._check_dir, base_url, dir): dir 
                           for dir in self.common_dirs}
                 
-                while completed < total_dirs:
-                    done, _ = concurrent.futures.wait(
-                        futures, 
-                        timeout=1,
-                        return_when=concurrent.futures.FIRST_COMPLETED
-                    )
-                    
-                    for future in done:
-                        try:
-                            result = future.result()
-                            if result:
-                                self.findings['directories'].append(result)
-                        except:
-                            pass
-                        completed += 1
-                        self.progress.update_dirs(completed, total_dirs)
-                        del futures[future]
-                    
-                    # Update status on each iteration
+                completed = 0
+                for future in concurrent.futures.as_completed(futures):
+                    try:
+                        result = future.result()
+                        if result:
+                            self.findings['directories'].append(result)
+                    except Exception as e:
+                        Printer.warning(f"Directory check failed: {str(e)}")
+                    completed += 1
+                    self.progress.update_dirs(completed, total_dirs)
                     self._check_status()
-            
+
             Printer.success(f"Found {len(self.findings['directories'])} valid directories")
+        except Exception as e:
+            Printer.error(f"Directory enumeration failed: {str(e)}")
         finally:
             self.scan_active = False
 
@@ -535,7 +506,7 @@ class CyberSentinel:
             return None
 
     def generate_report(self, format='html'):
-        """Generate scan report in specified format"""
+        """Generate scan report with proper output escaping"""
         try:
             report_file = f"reports/scan_{self.session_id}.{format}"
 
@@ -557,7 +528,7 @@ class CyberSentinel:
             f.write(f"""
             <html>
                 <head>
-                    <title>CyberGuardian Report - {self.findings['target']}</title>
+                    <title>CyberGuardian Report - {escape(self.findings['target'])}</title>
                     <style>
                         body {{ font-family: Arial, sans-serif; padding: 20px; }}
                         .vulnerability {{ color: #dc3545; font-weight: bold; }}
@@ -570,20 +541,20 @@ class CyberSentinel:
                     </style>
                 </head>
                 <body>
-                    <h1>Security Report for {self.findings['target']}</h1>
-                    <h3>Scan ID: {self.session_id}</h3>
+                    <h1>Security Report for {escape(self.findings['target'])}</h1>
+                    <h3>Scan ID: {escape(self.session_id)}</h3>
 
                     <h2>Network Discovery</h2>
                     <h3>Resolved IP Addresses</h3>
                     <ul>
-                        {"".join(f"<li class='ip'>{ip}</li>" for ip in self.findings['ips'])}
+                        {"".join(f"<li class='ip'>{escape(ip)}</li>" for ip in self.findings['ips'])}
                     </ul>
 
                     <h3>Open Ports & Services</h3>
                     <ul>
                         {"".join(
-                            f"<li><b>{service['ip']}:{service['port']}</b> - {service['service']} "
-                            f"(v{service['version']})</li>"
+                            f"<li><b>{escape(service['ip'])}:{escape(str(service['port']))}</b> - {escape(service['service'])} "
+                            f"(v{escape(service['version'])})</li>"
                             for service in self.findings['ports']
                         )}
                     </ul>
@@ -592,9 +563,9 @@ class CyberSentinel:
                     <h3>Vulnerabilities ({len(self.findings['vulnerabilities'])})</h3>
                     <ul>
                         {"".join(
-                            f"<li class='vulnerability'>{vuln['cve']} ({vuln['severity']})<br>"
-                            f"<small>{vuln['description']}</small><br>"
-                            f"<i>Affected service: {vuln['service']} on {vuln['ip']}:{vuln['port']}</i></li>"
+                            f"<li class='vulnerability'>{escape(vuln['cve'])} ({escape(vuln['severity'])})<br>"
+                            f"<small>{escape(vuln['description'])}</small><br>"
+                            f"<i>Affected service: {escape(vuln['service'])} on {escape(vuln['ip'])}:{escape(str(vuln['port']))}</i></li>"
                             for vuln in self.findings['vulnerabilities']
                         )}
                     </ul>
@@ -602,9 +573,9 @@ class CyberSentinel:
                     <h3>Potential Exploits ({len(self.findings['exploits'])})</h3>
                     <ul>
                         {"".join(
-                            f"<li class='exploit'><a href='{exploit['url']}' target='_blank'>"
-                            f"Exploit {exploit['exploit_id']}</a>: {exploit['description']}<br>"
-                            f"<i>Target service: {exploit['service']}</i></li>"
+                            f"<li class='exploit'><a href='{escape(exploit['url'])}' target='_blank'>"
+                            f"Exploit {escape(exploit['exploit_id'])}</a>: {escape(exploit['description'])}<br>"
+                            f"<i>Target service: {escape(exploit['service'])}</i></li>"
                             for exploit in self.findings['exploits']
                         )}
                     </ul>
@@ -612,8 +583,8 @@ class CyberSentinel:
                     <h2>Web Directory Discovery ({len(self.findings['directories'])})</h2>
                     <ul>
                         {"".join(
-                            f"<li><a href='{dir['url']}' target='_blank'>{dir['url']}</a> "
-                            f"(HTTP {dir['status']})</li>"
+                            f"<li><a href='{escape(dir['url'])}' target='_blank'>{escape(dir['url'])}</a> "
+                            f"(HTTP {escape(str(dir['status']))})</li>"
                             for dir in self.findings['directories']
                         )}
                     </ul>
