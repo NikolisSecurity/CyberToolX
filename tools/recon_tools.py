@@ -174,6 +174,10 @@ class ReconTools:
 
     def vuln_scan(self):
         """Vulnerability scanning with NSE scripts"""
+        if not HAS_NMAP:
+            AsciiArt.error_message("python-nmap not installed. Run: pip3 install python-nmap")
+            return []
+
         print(f"\n{colored('Starting vulnerability scan...', 'cyan')}")
         print(AsciiArt.tool_category_banner('recon'))
 
