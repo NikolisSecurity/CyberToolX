@@ -3,11 +3,17 @@
 import requests
 import ssl
 import socket
-import OpenSSL
 from termcolor import colored
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 from utils.ascii_art import AsciiArt
+
+# Optional OpenSSL import for advanced SSL features
+try:
+    from OpenSSL import crypto
+    HAS_OPENSSL = True
+except ImportError:
+    HAS_OPENSSL = False
 
 
 class WebTools:
