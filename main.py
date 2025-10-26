@@ -13,6 +13,9 @@ import os
 # Add current directory to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+# Add system site-packages to path to access installed modules
+sys.path.append('/usr/local/lib/python3.12/site-packages')
+
 from utils.menu_system import MenuSystem
 
 
