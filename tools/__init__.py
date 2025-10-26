@@ -1,8 +1,4 @@
 """Security tool modules"""
 
-from .recon_tools import ReconTools
-from .web_tools import WebTools
-from .network_tools import NetworkTools
-from .osint_tools import OSINTTools
-
-__all__ = ['ReconTools', 'WebTools', 'NetworkTools', 'OSINTTools']
+# Modules are imported directly where needed to avoid circular dependencies
+__all__ = ['recon_tools', 'web_tools', 'network_tools', 'osint_tools']
