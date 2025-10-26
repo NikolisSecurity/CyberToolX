@@ -31,6 +31,11 @@ class ReconTools:
 
     def quick_scan(self):
         """Quick scan of top 100 common ports"""
+        if not HAS_NMAP:
+            AsciiArt.error_message("python-nmap not installed. Run: pip3 install python-nmap")
+            AsciiArt.info_message("Note: Also requires 'nmap' system tool. Install with: sudo apt install nmap")
+            return []
+
         print(f"\n{colored('Starting quick port scan...', 'cyan')}")
         print(AsciiArt.tool_category_banner('recon'))
 
