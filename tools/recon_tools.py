@@ -82,6 +82,10 @@ class ReconTools:
 
     def deep_scan(self):
         """Deep scan of all 65535 ports"""
+        if not HAS_NMAP:
+            AsciiArt.error_message("python-nmap not installed. Run: pip3 install python-nmap")
+            return []
+
         print(f"\n{colored('Starting deep port scan (all 65535 ports)...', 'cyan')}")
         print(f"{colored('⚠ This may take 10-30 minutes', 'yellow')}")
         print(AsciiArt.tool_category_banner('recon'))
