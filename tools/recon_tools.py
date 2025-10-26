@@ -24,7 +24,10 @@ class ReconTools:
 
     def __init__(self, target):
         self.target = target
-        self.nm = nmap.PortScanner()
+        if HAS_NMAP:
+            self.nm = nmap.PortScanner()
+        else:
+            self.nm = None
 
     def quick_scan(self):
         """Quick scan of top 100 common ports"""
