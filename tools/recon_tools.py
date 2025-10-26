@@ -124,6 +124,10 @@ class ReconTools:
 
     def service_scan(self):
         """Aggressive service version detection"""
+        if not HAS_NMAP:
+            AsciiArt.error_message("python-nmap not installed. Run: pip3 install python-nmap")
+            return []
+
         print(f"\n{colored('Starting service version detection...', 'cyan')}")
         print(AsciiArt.tool_category_banner('recon'))
 
