@@ -1,6 +1,5 @@
 """Reconnaissance and scanning tools"""
 
-import nmap
 import socket
 import subprocess
 import sys
@@ -11,6 +10,13 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from utils.color_compat import colored
 from utils.ascii_art import AsciiArt
+
+# Optional nmap import
+try:
+    import nmap
+    HAS_NMAP = True
+except ImportError:
+    HAS_NMAP = False
 
 
 class ReconTools:
