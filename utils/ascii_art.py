@@ -1,6 +1,6 @@
 """Enhanced ASCII art for CyberGuardian Ultimate"""
 
-from termcolor import colored
+from .color_compat import colored
 import time
 import sys
 import random

@@ -3,9 +3,15 @@
 import requests
 import ssl
 import socket
-from termcolor import colored
+import sys
+import os
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
+
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from utils.color_compat import colored
 from utils.ascii_art import AsciiArt
 
 # Optional OpenSSL import for advanced SSL features

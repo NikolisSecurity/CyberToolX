@@ -1,8 +1,4 @@
 """Utility modules for CyberGuardian Ultimate"""
 
-from .art import SecurityArt
-from .printer import Printer
-from .progress import ScanProgress
-from .resolver import TargetResolver
-
-__all__ = ['SecurityArt', 'Printer', 'ScanProgress', 'TargetResolver']
+# Modules are imported directly where needed to avoid circular dependencies
+__all__ = ['ascii_art', 'command_parser', 'menu_system']

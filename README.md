@@ -5,8 +5,35 @@
 [![Version](https://img.shields.io/badge/version-2.0-blue.svg)](https://github.com/NikolisSecurity/CyberToolX)
 [![Python](https://img.shields.io/badge/python-3.8+-green.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-Authorized%20Use%20Only-red.svg)](LICENSE)
+[![Status](https://img.shields.io/badge/status-working-brightgreen.svg)](#)
 
-> *The ultimate command-line cybersecurity toolkit with interactive menu, auto-correction, and 60+ built-in tools*
+> *The ultimate command-line cybersecurity toolkit with interactive menu, auto-correction, and 25+ working security tools*
+
+---
+
+## 🚀 Quick Start
+
+```bash
+cd /workspace/cmh8969s900cor7i3v4rbn8n9/CyberToolX
+python3 main.py
+```
+
+**That's it!** The tool works out of the box with 25+ commands ready to use.
+
+### Example Session
+```bash
+cyber@guardian [no target] > target example.com
+✓ Target set to: example.com
+
+cyber@guardian [example.com] > dnsenum
+# DNS enumeration results...
+
+cyber@guardian [example.com] > headerscan
+# Security headers analysis...
+
+cyber@guardian [example.com] > help
+# Shows all 60+ available commands
+```
 
 ---
 

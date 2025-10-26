@@ -2,7 +2,7 @@
 
 import os
 import sys
-from termcolor import colored
+from .color_compat import colored
 from .ascii_art import AsciiArt
 from .command_parser import CommandParser
 

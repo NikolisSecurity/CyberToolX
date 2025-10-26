@@ -1,10 +1,22 @@
 """Reconnaissance and scanning tools"""
 
-import nmap
 import socket
 import subprocess
-from termcolor import colored
+import sys
+import os
+
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from utils.color_compat import colored
 from utils.ascii_art import AsciiArt
+
+# Optional nmap import
+try:
+    import nmap
+    HAS_NMAP = True
+except ImportError:
+    HAS_NMAP = False
 
 
 class ReconTools:
@@ -12,10 +24,18 @@ class ReconTools:
 
     def __init__(self, target):
         self.target = target
-        self.nm = nmap.PortScanner()
+        if HAS_NMAP:
+            self.nm = nmap.PortScanner()
+        else:
+            self.nm = None
 
     def quick_scan(self):
         """Quick scan of top 100 common ports"""
+        if not HAS_NMAP:
+            AsciiArt.error_message("python-nmap not installed. Run: pip3 install python-nmap")
+            AsciiArt.info_message("Note: Also requires 'nmap' system tool. Install with: sudo apt install nmap")
+            return []
+
         print(f"\n{colored('Starting quick port scan...', 'cyan')}")
         print(AsciiArt.tool_category_banner('recon'))
 
@@ -62,6 +82,10 @@ class ReconTools:
 
     def deep_scan(self):
         """Deep scan of all 65535 ports"""
+        if not HAS_NMAP:
+            AsciiArt.error_message("python-nmap not installed. Run: pip3 install python-nmap")
+            return []
+
         print(f"\n{colored('Starting deep port scan (all 65535 ports)...', 'cyan')}")
         print(f"{colored('⚠ This may take 10-30 minutes', 'yellow')}")
         print(AsciiArt.tool_category_banner('recon'))
@@ -100,6 +124,10 @@ class ReconTools:
 
     def service_scan(self):
         """Aggressive service version detection"""
+        if not HAS_NMAP:
+            AsciiArt.error_message("python-nmap not installed. Run: pip3 install python-nmap")
+            return []
+
         print(f"\n{colored('Starting service version detection...', 'cyan')}")
         print(AsciiArt.tool_category_banner('recon'))
 
@@ -146,6 +174,10 @@ class ReconTools:
 
     def vuln_scan(self):
         """Vulnerability scanning with NSE scripts"""
+        if not HAS_NMAP:
+            AsciiArt.error_message("python-nmap not installed. Run: pip3 install python-nmap")
+            return []
+
         print(f"\n{colored('Starting vulnerability scan...', 'cyan')}")
         print(AsciiArt.tool_category_banner('recon'))
 
