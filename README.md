@@ -1,37 +1,298 @@
-**:lock: CyberGuardian Ultimate - Advanced Cybersecurity Suite**  
-*Automated network scanning & vulnerability detection with real-time threat intelligence*  
+# 🛡️ CyberGuardian Ultimate v2.0
 
-:sparkles: **Features**:  
-- **:globe_with_meridians: Multi-Target Scanning**: Auto-resolve domains to IPs & scan all endpoints  
-- **:shield: Vulnerability Detection**: CVE correlation & Exploit-DB integration  
-- **:bar_chart: Smart Reporting**: HTML/JSON reports with prioritized findings  
-- **:zap: Real-Time Monitoring**: Progress tracking with Enter-key updates  
-- **:arrows_counterclockwise: Auto-Update**: Seamless GitHub integration for latest features  
+**Advanced Interactive Cybersecurity Warfare Platform**
 
-**:rocket: Ideal For**:  
-- Penetration testers  
-- System administrators  
-- Bug bounty hunters  
-- Security researchers
+[![Version](https://img.shields.io/badge/version-2.0-blue.svg)](https://github.com/NikolisSecurity/CyberToolX)
+[![Python](https://img.shields.io/badge/python-3.8+-green.svg)](https://python.org)
+[![License](https://img.shields.io/badge/license-Authorized%20Use%20Only-red.svg)](LICENSE)
 
-**:hammer_and_wrench: Installation**:
+> *The ultimate command-line cybersecurity toolkit with interactive menu, auto-correction, and 60+ built-in tools*
+
+---
+
+## ⚡ Features
+
+### 🎨 **Beautiful Interactive Interface**
+- **Matrix-style loading screen** with animated effects
+- **Command auto-correction** - never type a command wrong again
+- **Colorful menus** with cyberpunk aesthetics
+- **Real-time progress indicators** for all scans
+- **Multi-target management** - switch between targets seamlessly
+
+### 🔍 **60+ Security Tools in 6 Categories**
+
+#### 1️⃣ **Reconnaissance & Enumeration**
+- Quick/Deep Port Scanning (1-65535 ports)
+- Service Version Detection
+- Vulnerability Scanning with NSE scripts
+- Advanced Nmap integration
+- Network mapping and discovery
+
+#### 2️⃣ **Network Analysis**
+- DNS Enumeration (A, AAAA, MX, NS, TXT, SOA, CNAME)
+- Subdomain Discovery (30+ common subdomains)
+- DNS Zone Transfer Detection
+- WHOIS Lookup
+- Reverse DNS
+- GeoIP Location
+- Traceroute Analysis
+- ICMP Ping Testing
+
+#### 3️⃣ **Web Application Testing**
+- Security Headers Analysis (HSTS, CSP, X-Frame-Options, etc.)
+- SSL/TLS Configuration Scanning
+- Certificate Analysis & Expiry Checking
+- WAF/CDN Detection (Cloudflare, Akamai, AWS, F5, etc.)
+- CMS Detection (WordPress, Joomla, Drupal, etc.)
+- Directory Enumeration
+- robots.txt & sitemap.xml Analysis
+- Technology Stack Detection
+- API Endpoint Discovery
+- SQL Injection Testing
+- XSS Testing
+- CSRF Testing
+
+#### 4️⃣ **OSINT & Intelligence**
+- Email Harvesting
+- Social Media Link Discovery
+- Metadata Extraction
+- Technology Fingerprinting
+- People Search
+- Phone Number Lookup
+- Breach Database Checking
+
+#### 5️⃣ **Exploitation Tools**
+- Exploit Database Search
+- Metasploit Integration
+- Reverse Shell Generator
+- Payload Generator
+- Custom Exploit Execution
+
+#### 6️⃣ **Reporting & Analysis**
+- Comprehensive HTML Reports
+- JSON Export
+- CSV Export
+- XML Export
+- Scan History
+- Result Comparison
+- Visual Charts & Graphs
+
+---
+
+## 📦 Installation
+
+### Requirements
+- **Python 3.8+**
+- **nmap** (system package)
+- **Linux/Unix** (recommended) or macOS
+
+### Quick Install
+
 ```bash
-sudo apt install nmap git
-pip install -r requirements.txt
+# Clone repository
+git clone https://github.com/NikolisSecurity/CyberToolX.git
+cd CyberToolX
+
+# Install system dependencies
+sudo apt update
+sudo apt install nmap whois traceroute dnsutils -y
+
+# Install Python dependencies
+pip3 install -r requirements.txt
+
+# Launch CyberGuardian
+python3 main.py
 ```
 
-**:8ball: Basic Usage**:
+---
+
+## 🚀 Quick Start
+
+### Launch the Tool
 ```bash
-# Basic scan with HTML or JSON report
-python3 main.py example.com -o/--output html/json
-
-# Deep scan with HTML or JSON report
-python3 main.py example.com -m/--mode fast/deep -o/--output html/json
-
-# Force update check
-python3 main.py -u/--update
+python3 main.py
 ```
 
-*Star :star: to support development | Contribute :toolbox: to enhance features*  
+You'll see a beautiful loading screen, then the main interface:
 
-*(Python | Nmap | Exploit-DB | CVE Mitre integrated)*
+```
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                    ULTIMATE CYBER WARFARE PLATFORM v2.0                       ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+Type 'help' for available commands | Type 'exit' to quit
+
+cyber@guardian [no target] >
+```
+
+### Basic Workflow
+
+```bash
+# 1. Set your target
+cyber@guardian [no target] > target scanme.nmap.org
+
+✓ Target set to: scanme.nmap.org
+
+# 2. Run a quick scan
+cyber@guardian [scanme.nmap.org] > quickscan
+
+# 3. Check for vulnerabilities
+cyber@guardian [scanme.nmap.org] > vulnscan
+
+# 4. View results
+cyber@guardian [scanme.nmap.org] > results
+
+# 5. Exit
+cyber@guardian [scanme.nmap.org] > exit
+```
+
+---
+
+## 📚 Command Reference
+
+### Main Commands
+
+| Command | Description |
+|---------|-------------|
+| `help` | Display all available commands with descriptions |
+| `clear` | Clear the screen |
+| `banner` | Display the main banner |
+| `about` | About CyberGuardian Ultimate |
+| `exit` / `quit` | Exit the application |
+
+### Target Management
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `target <host>` | Set target for scanning | `target example.com` |
+| `showtarget` | Display current target | `showtarget` |
+| `cleartarget` | Clear current target | `cleartarget` |
+
+### Reconnaissance (12 tools)
+
+- `quickscan` - Quick scan of top 100 ports
+- `deepscan` - Deep scan of all 65535 ports
+- `servicescan` - Service version detection
+- `vulnscan` - Vulnerability scanning
+- `nmap` - Advanced nmap options
+- `ping` - ICMP ping test
+- `traceroute` - Trace route to target
+- `portscan` - Full port scanning
+- `portsweep` - Multiple host sweep
+
+### Network Analysis (9 tools)
+
+- `dnsenum` - DNS enumeration
+- `subdomain` - Subdomain discovery
+- `dnszone` - DNS zone transfer
+- `whois` - WHOIS lookup
+- `reverse` - Reverse DNS
+- `geoip` - Geolocation
+
+### Web Testing (13 tools)
+
+- `webscan` - Complete web scan
+- `headerscan` - Security headers
+- `sslscan` - SSL/TLS analysis
+- `wafscan` - WAF detection
+- `cmsscan` - CMS detection
+- `robots` - robots.txt check
+- `dirscan` - Directory enum
+- `apiscan` - API discovery
+- `sqlmap` - SQL injection
+- `xsstest` - XSS testing
+
+### OSINT (7 tools)
+
+- `emailharvest` - Email harvesting
+- `social` - Social media links
+- `metadata` - Metadata extraction
+- `techstack` - Technology detection
+- `breach` - Breach checking
+- `peoplesearch` - People OSINT
+
+### Results (5 tools)
+
+- `results` - Show all results
+- `report` - Generate report
+- `export` - Export to file
+- `history` - Scan history
+- `compare` - Compare scans
+
+---
+
+## 🎯 Usage Examples
+
+### Example 1: Quick Web Audit
+
+```bash
+python3 main.py
+
+cyber@guardian [no target] > target https://example.com
+cyber@guardian [https://example.com] > quickscan
+cyber@guardian [https://example.com] > headerscan
+cyber@guardian [https://example.com] > sslscan
+cyber@guardian [https://example.com] > results
+```
+
+### Example 2: Network Assessment
+
+```bash
+cyber@guardian [no target] > target company.com
+cyber@guardian [company.com] > dnsenum
+cyber@guardian [company.com] > subdomain
+cyber@guardian [company.com] > deepscan
+cyber@guardian [company.com] > vulnscan
+cyber@guardian [company.com] > report
+```
+
+---
+
+## 🎨 Features Showcase
+
+### Auto-Correction
+
+```bash
+cyber@guardian [target] > quckscan
+
+Did you mean: quickscan?
+[y/n]: y
+✓ Using: quickscan
+```
+
+### Beautiful Output
+- ✅ Green for success
+- ⚠️ Yellow for warnings
+- ❌ Red for errors
+- 💡 Cyan for info
+
+---
+
+## 🛡️ Legal Disclaimer
+
+**⚠️ AUTHORIZED USE ONLY**
+
+This tool is for **AUTHORIZED SECURITY TESTING ONLY**.
+
+- ✅ Use on systems you own
+- ✅ Use with written permission
+- ❌ NEVER use without authorization
+
+**Unauthorized access is illegal. Users are responsible for their actions.**
+
+---
+
+## 🚀 What's New in v2.0
+
+- ✨ Interactive menu system
+- 🎨 Beautiful ASCII art & loading screens
+- 🔧 Auto-correction for commands
+- 📊 60+ security tools
+- 🎯 Multi-target management
+- 📈 Real-time progress tracking
+- 🌈 Colorful cyberpunk theme
+- 📝 Enhanced reporting
+
+---
+
+**Stay Safe. Stay Ethical. Happy Hacking! 👾🛡️**
