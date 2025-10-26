@@ -208,7 +208,20 @@ class CyberSentinel:
         Printer.critical(f"Found {vuln['cve']} ({vuln['severity']}) - {service['service']}")
 
     def _check_exploit_db(self, service):
-        """Search Exploit-DB for available exploits"""
+        """
+        Search Exploit-DB for available exploits using local CSV database.
+        Falls back to web scraping if CSV is unavailable.
+        """
+        service_name = service['service'].split()[0]
+        service_version = service.get('version', '')
+
+        # Try local CSV search first (faster and more reliable)
+        exploits = ThreatIntel.search_exploit_db_csv(service_name, service_version, max_results=3)
+
+        if exploits:
+            return exploits
+
+        # Fallback to web scraping if CSV search yielded no results
         try:
             time.sleep(1)  # Respect rate limits
             headers = {
@@ -216,7 +229,7 @@ class CyberSentinel:
                 'Accept-Language': 'en-US,en;q=0.5'
             }
 
-            search_query = f"{service['service']} {service['version']}".strip()
+            search_query = f"{service['service']} {service_version}".strip()
             params = {'q': search_query}
 
             response = requests.get(
@@ -227,7 +240,6 @@ class CyberSentinel:
             )
 
             if response.status_code != 200:
-                Printer.warning(f"Exploit DB search failed (HTTP {response.status_code})")
                 return []
 
             soup = BeautifulSoup(response.text, 'html.parser')
@@ -251,12 +263,11 @@ class CyberSentinel:
                             'url': url
                         })
                     except Exception as e:
-                        Printer.warning(f"Skipping invalid exploit row: {str(e)}")
+                        continue
 
-            return exploits[:3]  # Return top 3 results
+            return exploits[:3]
 
         except Exception as e:
-            Printer.warning(f"Exploit DB check failed: {str(e)}")
             return []
 
     def directory_enum(self, base_url):
