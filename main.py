@@ -182,7 +182,7 @@ class ThreatIntel:
 class Printer:
     @staticmethod
     def _format(message, level, color, attrs=None):
-        border = colored('' * (len(message) + 4), color)
+        border = colored('═' * (len(message) + 4), color)
         return f"{border}\n  {colored(level, color, attrs=attrs)} {message}\n{border}"
 
     @staticmethod
