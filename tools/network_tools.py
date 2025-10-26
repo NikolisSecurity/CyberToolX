@@ -2,10 +2,16 @@
 
 import socket
 import subprocess
+import sys
+import os
 import dns.resolver
 import dns.zone
 import dns.query
-from termcolor import colored
+
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from utils.color_compat import colored
 from utils.ascii_art import AsciiArt
 
 
