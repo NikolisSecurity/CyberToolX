@@ -519,8 +519,14 @@ class CyberSentinel:
             response = requests.get(url, timeout=3, allow_redirects=False)
             if response.status_code in [200, 301, 302, 403]:
                 return {'url': url, 'status': response.status_code}
-        except:
+        except requests.RequestException:
+            # Catch HTTP errors but allow KeyboardInterrupt to propagate
             return None
+        except Exception as e:
+            # Log unexpected errors but allow keyboard interrupts
+            if not isinstance(e, KeyboardInterrupt):
+                return None
+            raise
 
     def generate_report(self, format='html'):
         """Generate scan report with proper output escaping"""
