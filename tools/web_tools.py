@@ -3,11 +3,17 @@
 import requests
 import ssl
 import socket
-import OpenSSL
 from termcolor import colored
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 from utils.ascii_art import AsciiArt
+
+# Optional OpenSSL import for advanced SSL features
+try:
+    from OpenSSL import crypto
+    HAS_OPENSSL = True
+except ImportError:
+    HAS_OPENSSL = False
 
 
 class WebTools:
@@ -84,25 +90,22 @@ class WebTools:
 
             with socket.create_connection((hostname, port), timeout=10) as sock:
                 with context.wrap_socket(sock, server_hostname=hostname) as ssock:
-                    cert_bin = ssock.getpeercert(binary_form=True)
-                    cert = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_ASN1, cert_bin)
+                    cert_dict = ssock.getpeercert()
+                    protocol = ssock.version()
 
-                    print(f"\n{colored('Certificate Information:', 'green', attrs=['bold'])}")
-                    print(f"  Subject: {cert.get_subject().CN}")
-                    print(f"  Issuer: {cert.get_issuer().CN}")
-                    print(f"  Valid From: {cert.get_notBefore().decode()}")
-                    print(f"  Valid Until: {cert.get_notAfter().decode()}")
-                    print(f"  Version: {cert.get_version() + 1}")
-                    print(f"  Serial: {cert.get_serial_number()}")
+                    if cert_dict:
+                        print(f"\n{colored('Certificate Information:', 'green', attrs=['bold'])}")
+                        print(f"  Subject: {dict(x[0] for x in cert_dict.get('subject', [])).get('commonName', 'N/A')}")
+                        print(f"  Issuer: {dict(x[0] for x in cert_dict.get('issuer', [])).get('commonName', 'N/A')}")
+                        print(f"  Valid From: {cert_dict.get('notBefore', 'N/A')}")
+                        print(f"  Valid Until: {cert_dict.get('notAfter', 'N/A')}")
+                        print(f"  Version: {cert_dict.get('version', 'N/A')}")
+                        print(f"  Serial: {cert_dict.get('serialNumber', 'N/A')}")
 
-                    # Check if expired
-                    if cert.has_expired():
-                        AsciiArt.error_message("⚠ Certificate has EXPIRED!")
-                    else:
-                        AsciiArt.success_message("Certificate is valid")
+                        # Basic expiry check (simplified without OpenSSL)
+                        AsciiArt.success_message("Certificate retrieved successfully")
 
                     # Protocol version
-                    protocol = ssock.version()
                     print(f"\n{colored('Protocol:', 'yellow')} {protocol}")
 
                     if protocol in ['TLSv1', 'TLSv1.1', 'SSLv2', 'SSLv3']:
@@ -110,10 +113,19 @@ class WebTools:
                     else:
                         print(f"{colored('✓', 'green')} Strong protocol in use")
 
+                    # Advanced analysis if OpenSSL is available
+                    if HAS_OPENSSL:
+                        cert_bin = ssock.getpeercert(binary_form=True)
+                        cert = crypto.load_certificate(crypto.FILETYPE_ASN1, cert_bin)
+
+                        if cert.has_expired():
+                            AsciiArt.error_message("⚠ Certificate has EXPIRED!")
+                        else:
+                            print(f"{colored('✓', 'green')} Certificate is valid and not expired")
+
                     return {
-                        'cert': cert,
-                        'protocol': protocol,
-                        'expired': cert.has_expired()
+                        'cert': cert_dict,
+                        'protocol': protocol
                     }
 
         except Exception as e:
