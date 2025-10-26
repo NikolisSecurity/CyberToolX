@@ -26,7 +26,7 @@ pip install -r requirements.txt
 python3 main.py example.com -o/--output html/json
 
 # Deep scan with HTML or JSON report
-python3 main.py example.com -m/--mode fast/deep -o/--ouput html/json
+python3 main.py example.com -m/--mode fast/deep -o/--output html/json
 
 # Force update check
 python3 main.py -u/--update
