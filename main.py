@@ -341,22 +341,39 @@ class CyberSentinel:
         try:
             self.scan_active = True
             Printer.status(f"Starting port scan on {ip} ({ports})")
-            
+
+            # Calculate estimated port count
+            if '-' in ports:
+                port_parts = ports.split('-')
+                estimated_ports = int(port_parts[1]) - int(port_parts[0]) + 1
+            else:
+                estimated_ports = len(ports.split(','))
+
             # Configure scan parameters
             scan_args = '-sS -sV -T4 --open --script vulners'
             self.nm.scan(ip, ports, arguments=scan_args)
-            
-            # Track scan progress using elapsed time
+
+            # Track scan progress with better estimation
             start_time = time.time()
+            last_update = 0
             while self.nm.still_scanning():
                 elapsed = time.time() - start_time
-                self.progress.update_ports(int(elapsed), 100)  # Approximate progress
-                self._check_status()
-                time.sleep(1)
+                # Improved progress estimation based on typical scan speeds
+                progress = min(int((elapsed / (estimated_ports * 0.01)) * 100), 99)
+                self.progress.update_ports(progress, 100)
 
-            # Process results
+                if elapsed - last_update >= 1:
+                    self._check_status()
+                    last_update = elapsed
+                time.sleep(0.5)
+
+            # Mark as complete
+            self.progress.update_ports(100, 100)
+
+            # Process results with better error handling
             if ip not in self.nm.all_hosts():
-                raise ValueError("Target not in scan results")
+                Printer.warning(f"No open ports found on {ip} or target is unreachable")
+                return
 
             host_data = self.nm[ip]
             open_ports = []
