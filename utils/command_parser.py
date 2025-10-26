@@ -1,7 +1,7 @@
 """Command parser with auto-correction and fuzzy matching"""
 
 import difflib
-from termcolor import colored
+from .color_compat import colored
 
 
 class CommandParser:
