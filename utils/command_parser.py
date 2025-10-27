@@ -42,19 +42,11 @@ class CommandParser:
         close_matches = difflib.get_close_matches(command, self.command_list, n=3, cutoff=0.6)
 
         if close_matches:
-            suggestion = close_matches[0]
-            print(f"\n{colored('Did you mean:', 'yellow')} {colored(suggestion, 'green', attrs=['bold'])}?")
-            response = input(f"{colored('[y/n]:', 'cyan')} ").strip().lower()
-
-            if response == 'y' or response == 'yes' or response == '':
-                print(f"{colored('✓', 'green')} Using: {colored(suggestion, 'green', attrs=['bold'])}")
-                return suggestion, args
-            else:
-                print(f"{colored('✗', 'red')} Command cancelled")
-                return None, None
+            # Show simple error message without suggestions
+            print(f'\nCommand "{command}" is not valid.')
+            return None, None
         else:
-            print(f"\n{colored('✗', 'red')} Unknown command: {colored(command, 'red', attrs=['bold'])}")
-            print(f"{colored('💡 Tip:', 'cyan')} Type {colored('help', 'green', attrs=['bold'])} to see available commands")
+            print(f'\nCommand "{command}" is not valid.')
             return None, None
 
     def suggest_commands(self, prefix):
