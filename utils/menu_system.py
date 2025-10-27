@@ -314,14 +314,14 @@ class MenuSystem:
                 self.display_help()
             elif command == 'clear':
                 self.clear_screen()
-                print(AsciiArt.main_banner())
+                print(AsciiArt.main_banner(self.current_target))
             elif command in ['exit', 'quit']:
                 self.running = False
-                print(f"\n{colored('Shutting down CyberGuardian Ultimate...', 'cyan')}")
+                print(f"\n{colored('Shutting down NPS Tool...', 'cyan')}")
                 print(colored('Stay safe. Stay ethical. 👾\n', 'green'))
             elif command == 'banner':
                 self.clear_screen()
-                print(AsciiArt.main_banner())
+                print(AsciiArt.main_banner(self.current_target))
             elif command == 'about':
                 self.display_about()
 
