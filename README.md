@@ -141,21 +141,23 @@ To view the list of commands, type help
 
 ```bash
 # 1. Set your target
-cyber@guardian [no target] > target scanme.nmap.org
+[>] target example.com
 
-✓ Target set to: scanme.nmap.org
+✓ Target set to: example.com
 
-# 2. Run a quick scan
-cyber@guardian [scanme.nmap.org] > quickscan
+# 2. Run web security scans
+[>] headerscan
+[>] sslscan
+[>] wafscan
 
-# 3. Check for vulnerabilities
-cyber@guardian [scanme.nmap.org] > vulnscan
+# 3. Enumerate subdomains
+[>] subdomain
 
 # 4. View results
-cyber@guardian [scanme.nmap.org] > results
+[>] results
 
 # 5. Exit
-cyber@guardian [scanme.nmap.org] > exit
+[>] exit
 ```
 
 ---
