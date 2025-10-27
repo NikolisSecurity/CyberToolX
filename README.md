@@ -116,16 +116,25 @@ python3 main.py
 python3 main.py
 ```
 
-You'll see a beautiful loading screen, then the main interface:
+You'll see a loading screen with web security module initialization, then the main interface:
 
 ```
-╔═══════════════════════════════════════════════════════════════════════════════╗
-║                    ULTIMATE CYBER WARFARE PLATFORM v2.0                       ║
-╚═══════════════════════════════════════════════════════════════════════════════╝
+╒═════════════════════╕
+│ Account Information │
+│ Target: Not Set     │
+│ IP: 203.0.113.45    │
+╘═════════════════════╛
 
-Type 'help' for available commands | Type 'exit' to quit
+══╦═════════════════════════════════════╦══
+╔════════════════════════════════════════╗
+│  NPS Tool                              │
+│  Advanced Web Security Testing         │
+╚════════════════════════════════════════╝
 
-cyber@guardian [no target] >
+Hello @username. Welcome to NPS Tool
+To view the list of commands, type help
+
+[>]
 ```
 
 ### Basic Workflow
