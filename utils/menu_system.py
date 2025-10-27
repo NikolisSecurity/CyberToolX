@@ -215,6 +215,7 @@ class MenuSystem:
             'Forensics & OSINT': ['emailharvest', 'metadata', 'social', 'phonelookup', 'iplookup', 'breach', 'peoplesearch'],
             'Reporting': ['results', 'report', 'export', 'history', 'compare'],
             'Configuration': ['settings', 'proxy', 'threads', 'timeout', 'verbose', 'update'],
+            'Analytics': ['stats', 'timeline', 'performance', 'exportstats'],
             'Advanced': ['script', 'schedule', 'monitor', 'honeypot', 'custom']
         }
 
