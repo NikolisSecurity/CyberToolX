@@ -12,7 +12,16 @@ class AsciiArt:
     """Beautiful ASCII art for the cybersecurity platform"""
 
     @staticmethod
-    def main_banner():
+    def get_public_ip():
+        """Fetch public IP address from ipify.org API"""
+        try:
+            response = requests.get('https://api.ipify.org?format=json', timeout=3)
+            return response.json()['ip']
+        except Exception:
+            return "Unavailable"
+
+    @staticmethod
+    def main_banner(target=None):
         """Main banner with cyberpunk style"""
         banner = """
 ╔═══════════════════════════════════════════════════════════════════════════════╗
