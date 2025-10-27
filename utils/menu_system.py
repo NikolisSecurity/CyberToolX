@@ -650,9 +650,11 @@ class MenuSystem:
         avg_slow = [(cmd, stats) for cmd, stats in command_stats.items() if stats["avg"] > 1.0]
         avg_slow.sort(key=lambda x: x[1]["avg"], reverse=True)
         fastest = [(cmd, stats) for cmd, stats in command_stats.items() if stats["avg"] < 0.1]
-        fastest.sort(key=lambda x: x[1]["avg"])[:10]
+        fastest.sort(key=lambda x: x[1]["avg"])
+        fastest = fastest[:10]
         error_prone = [(cmd, stats) for cmd, stats in command_stats.items() if stats["error_rate"] > 0]
-        error_prone.sort(key=lambda x: x[1]["error_rate"], reverse=True)[:10]
+        error_prone.sort(key=lambda x: x[1]["error_rate"], reverse=True)
+        error_prone = error_prone[:10]
 
         print(colored("\n╔═══════════════════ COMMAND PERFORMANCE METRICS ═════════════════╗\n", 'cyan', attrs=['bold']))
 
