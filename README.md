@@ -18,21 +18,21 @@ cd /workspace/cmh8969s900cor7i3v4rbn8n9/CyberToolX
 python3 main.py
 ```
 
-**That's it!** The tool works out of the box with 25+ commands ready to use.
+**That's it!** The tool works out of the box with 20+ commands ready to use.
 
 ### Example Session
 ```bash
-cyber@guardian [no target] > target example.com
+[>] target example.com
 ✓ Target set to: example.com
 
-cyber@guardian [example.com] > dnsenum
+[>] dnsenum
 # DNS enumeration results...
 
-cyber@guardian [example.com] > headerscan
+[>] headerscan
 # Security headers analysis...
 
-cyber@guardian [example.com] > help
-# Shows all 60+ available commands
+[>] help
+# Shows all available web security commands
 ```
 
 ---
