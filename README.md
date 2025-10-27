@@ -40,69 +40,45 @@ python3 main.py
 ## ⚡ Features
 
 ### 🎨 **Beautiful Interactive Interface**
-- **Matrix-style loading screen** with animated effects
+- **Compact box-drawing style banner** with account information
 - **Command auto-correction** - never type a command wrong again
-- **Colorful menus** with cyberpunk aesthetics
+- **Colorful terminal interface** with clean aesthetics
 - **Real-time progress indicators** for all scans
 - **Multi-target management** - switch between targets seamlessly
 
-### 🔍 **60+ Security Tools in 6 Categories**
+### 🔍 **20+ Web Security Tools**
 
-#### 1️⃣ **Reconnaissance & Enumeration**
-- Quick/Deep Port Scanning (1-65535 ports)
-- Service Version Detection
-- Vulnerability Scanning with NSE scripts
-- Advanced Nmap integration
-- Network mapping and discovery
-
-#### 2️⃣ **Network Analysis**
-- DNS Enumeration (A, AAAA, MX, NS, TXT, SOA, CNAME)
-- Subdomain Discovery (30+ common subdomains)
-- DNS Zone Transfer Detection
-- WHOIS Lookup
-- Reverse DNS
-- GeoIP Location
-- Traceroute Analysis
-- ICMP Ping Testing
-
-#### 3️⃣ **Web Application Testing**
+#### 🌐 **Web Application Testing**
 - Security Headers Analysis (HSTS, CSP, X-Frame-Options, etc.)
 - SSL/TLS Configuration Scanning
 - Certificate Analysis & Expiry Checking
 - WAF/CDN Detection (Cloudflare, Akamai, AWS, F5, etc.)
 - CMS Detection (WordPress, Joomla, Drupal, etc.)
-- Directory Enumeration
 - robots.txt & sitemap.xml Analysis
 - Technology Stack Detection
 - API Endpoint Discovery
-- SQL Injection Testing
-- XSS Testing
-- CSRF Testing
+- SQL Injection Testing (placeholder)
+- XSS Testing (placeholder)
+- CSRF Testing (placeholder)
+- GraphQL Testing (placeholder)
+- JWT Analysis (placeholder)
 
-#### 4️⃣ **OSINT & Intelligence**
-- Email Harvesting
-- Social Media Link Discovery
-- Metadata Extraction
+#### 🔍 **DNS & Subdomain**
+- DNS Enumeration (A, AAAA, MX, NS, TXT, SOA, CNAME)
+- Subdomain Discovery (30+ common subdomains)
+
+#### 🕵️ **Web OSINT**
+- Email Harvesting from websites
+- Metadata Extraction from web pages
 - Technology Fingerprinting
-- People Search
-- Phone Number Lookup
-- Breach Database Checking
 
-#### 5️⃣ **Exploitation Tools**
-- Exploit Database Search
-- Metasploit Integration
-- Reverse Shell Generator
-- Payload Generator
-- Custom Exploit Execution
-
-#### 6️⃣ **Reporting & Analysis**
-- Comprehensive HTML Reports
-- JSON Export
-- CSV Export
-- XML Export
+#### 📊 **Reporting & Analysis**
+- Scan Results Display
+- Report Generation
+- Export to File
 - Scan History
 - Result Comparison
-- Visual Charts & Graphs
+- Analytics & Performance Tracking
 
 ---
 
