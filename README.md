@@ -182,56 +182,44 @@ To view the list of commands, type help
 | `showtarget` | Display current target | `showtarget` |
 | `cleartarget` | Clear current target | `cleartarget` |
 
-### Reconnaissance (12 tools)
-
-- `quickscan` - Quick scan of top 100 ports
-- `deepscan` - Deep scan of all 65535 ports
-- `servicescan` - Service version detection
-- `vulnscan` - Vulnerability scanning
-- `nmap` - Advanced nmap options
-- `ping` - ICMP ping test
-- `traceroute` - Trace route to target
-- `portscan` - Full port scanning
-- `portsweep` - Multiple host sweep
-
-### Network Analysis (9 tools)
-
-- `dnsenum` - DNS enumeration
-- `subdomain` - Subdomain discovery
-- `dnszone` - DNS zone transfer
-- `whois` - WHOIS lookup
-- `reverse` - Reverse DNS
-- `geoip` - Geolocation
-
 ### Web Testing (13 tools)
 
-- `webscan` - Complete web scan
-- `headerscan` - Security headers
+- `webscan` - Complete web scan (placeholder)
+- `headerscan` - Security headers analysis
 - `sslscan` - SSL/TLS analysis
 - `wafscan` - WAF detection
 - `cmsscan` - CMS detection
 - `robots` - robots.txt check
-- `dirscan` - Directory enum
-- `apiscan` - API discovery
-- `sqlmap` - SQL injection
-- `xsstest` - XSS testing
+- `dirscan` - Directory enumeration (placeholder)
+- `apiscan` - API discovery (placeholder)
+- `sqlmap` - SQL injection (placeholder)
+- `xsstest` - XSS testing (placeholder)
+- `csrftest` - CSRF testing (placeholder)
+- `graphql` - GraphQL testing (placeholder)
+- `jwtscan` - JWT analysis (placeholder)
 
-### OSINT (7 tools)
+### DNS & Subdomain (2 tools)
+
+- `dnsenum` - DNS enumeration
+- `subdomain` - Subdomain discovery
+
+### Web OSINT (3 tools)
 
 - `emailharvest` - Email harvesting
-- `social` - Social media links
 - `metadata` - Metadata extraction
 - `techstack` - Technology detection
-- `breach` - Breach checking
-- `peoplesearch` - People OSINT
 
-### Results (5 tools)
+### Reporting & Analytics (9 tools)
 
 - `results` - Show all results
-- `report` - Generate report
-- `export` - Export to file
-- `history` - Scan history
-- `compare` - Compare scans
+- `report` - Generate report (placeholder)
+- `export` - Export to file (placeholder)
+- `history` - Scan history (placeholder)
+- `compare` - Compare scans (placeholder)
+- `stats` - Usage statistics
+- `timeline` - Command timeline
+- `performance` - Performance metrics
+- `exportstats` - Export analytics
 
 ---
 
