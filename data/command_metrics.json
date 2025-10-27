@@ -1,0 +1,32 @@
+{
+  "metrics": [
+    {
+      "command": "target",
+      "timestamp": "2025-10-27T17:11:02.040897",
+      "duration": 0.0,
+      "status": "success",
+      "target": "192.168.1.100",
+      "error": null
+    },
+    {
+      "command": "showtarget",
+      "timestamp": "2025-10-27T17:11:02.041143",
+      "duration": 0.0,
+      "status": "success",
+      "target": "192.168.1.100",
+      "error": null
+    },
+    {
+      "command": "cleartarget",
+      "timestamp": "2025-10-27T17:11:02.041352",
+      "duration": 0.0,
+      "status": "success",
+      "target": null,
+      "error": null
+    }
+  ],
+  "summary": {
+    "total_commands": 3,
+    "last_updated": "2025-10-27T17:11:02.041352"
+  }
+}
