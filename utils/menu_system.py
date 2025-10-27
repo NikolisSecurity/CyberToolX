@@ -666,7 +666,9 @@ class MenuSystem:
         if avg_slow:
             print(f"\n  {colored('Average Execution Times (>1s):', 'yellow', attrs=['bold'])}")
             for cmd, stats in avg_slow:
-                print(f"    {colored(cmd, 'yellow')}: {colored(f'{stats[\"avg\"]:.3f}s avg', 'white')} ({stats['total']} runs)")
+                avg_time = stats["avg"]
+                run_count = stats["total"]
+                print(f"    {colored(cmd, 'yellow')}: {colored(f'{avg_time:.3f}s avg', 'white')} ({run_count} runs)")
 
         if fastest:
             print(f"\n  {colored('Fastest Commands:', 'yellow', attrs=['bold'])}")
