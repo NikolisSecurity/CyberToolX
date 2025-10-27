@@ -230,22 +230,24 @@ To view the list of commands, type help
 ```bash
 python3 main.py
 
-cyber@guardian [no target] > target https://example.com
-cyber@guardian [https://example.com] > quickscan
-cyber@guardian [https://example.com] > headerscan
-cyber@guardian [https://example.com] > sslscan
-cyber@guardian [https://example.com] > results
+[>] target https://example.com
+[>] headerscan
+[>] sslscan
+[>] wafscan
+[>] cmsscan
+[>] results
 ```
 
-### Example 2: Network Assessment
+### Example 2: Comprehensive Web Assessment
 
 ```bash
-cyber@guardian [no target] > target company.com
-cyber@guardian [company.com] > dnsenum
-cyber@guardian [company.com] > subdomain
-cyber@guardian [company.com] > deepscan
-cyber@guardian [company.com] > vulnscan
-cyber@guardian [company.com] > report
+[>] target company.com
+[>] dnsenum
+[>] subdomain
+[>] techstack
+[>] emailharvest
+[>] robots
+[>] stats
 ```
 
 ---
