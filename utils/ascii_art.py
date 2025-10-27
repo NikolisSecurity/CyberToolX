@@ -99,14 +99,14 @@ class AsciiArt:
 
         colors = ['red', 'yellow', 'green', 'cyan', 'magenta']
 
-        for i in range(8):
+        for i in range(6):
             sys.stdout.write('\033[2J\033[H')  # Clear screen
             frame = frames[i % len(frames)]
             color = colors[i % len(colors)]
             print(colored(frame, color, attrs=['bold']))
 
             # Progress bar
-            progress = int((i + 1) / 8 * 50)
+            progress = int((i + 1) / 6 * 50)
             bar = '█' * progress + '░' * (50 - progress)
             print(f"\n    [{colored(bar, color)}] {int((i + 1) / 8 * 100)}%")
 
