@@ -673,7 +673,8 @@ class MenuSystem:
         if fastest:
             print(f"\n  {colored('Fastest Commands:', 'yellow', attrs=['bold'])}")
             for cmd, stats in fastest[:10]:
-                print(f"    {colored(cmd, 'green')}: {colored(f'{stats[\"avg\"]:.3f}s', 'green')}")
+                avg_time = stats["avg"]
+                print(f"    {colored(cmd, 'green')}: {colored(f'{avg_time:.3f}s', 'green')}")
 
         if error_prone:
             print(f"\n  {colored('Error-Prone Commands:', 'yellow', attrs=['bold'])}")
