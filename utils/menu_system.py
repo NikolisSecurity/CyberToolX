@@ -29,34 +29,15 @@ class MenuSystem:
             # Main Menu
             'help': 'Display available commands and usage',
             'clear': 'Clear the screen',
-            'exit': 'Exit CyberGuardian Ultimate',
-            'quit': 'Exit CyberGuardian Ultimate',
+            'exit': 'Exit NPS Tool',
+            'quit': 'Exit NPS Tool',
             'banner': 'Display the main banner',
-            'about': 'About CyberGuardian Ultimate',
+            'about': 'About NPS Tool',
 
             # Target Management
             'target': 'Set target for scanning (usage: target <ip/domain>)',
             'showtarget': 'Display current target',
             'cleartarget': 'Clear current target',
-
-            # Reconnaissance Tools
-            'portscan': 'Comprehensive port scanning',
-            'quickscan': 'Quick scan of common ports',
-            'deepscan': 'Deep scan of all 65535 ports',
-            'servicescan': 'Service version detection',
-            'vulnscan': 'Vulnerability scanning',
-            'nmap': 'Advanced nmap scanning with custom options',
-
-            # Network Analysis
-            'ping': 'ICMP ping test',
-            'traceroute': 'Trace route to target',
-            'dnsenum': 'DNS enumeration',
-            'dnszone': 'DNS zone transfer attempt',
-            'subdomain': 'Subdomain enumeration',
-            'whois': 'WHOIS lookup',
-            'geoip': 'Geolocation lookup',
-            'reverse': 'Reverse DNS lookup',
-            'portsweep': 'Sweep multiple hosts for open ports',
 
             # Web Application Testing
             'webscan': 'Complete web application scan',
@@ -73,34 +54,14 @@ class MenuSystem:
             'jwtscan': 'JWT token analysis',
             'robots': 'Check robots.txt and sitemap.xml',
 
-            # Exploitation
-            'exploitsearch': 'Search for exploits',
-            'metasploit': 'Metasploit integration',
-            'shellgen': 'Reverse shell generator',
-            'payloadgen': 'Payload generator',
-            'exploit': 'Execute exploit module',
+            # DNS/Subdomain
+            'dnsenum': 'DNS enumeration',
+            'subdomain': 'Subdomain enumeration',
 
-            # Wireless Security
-            'wifiscan': 'Scan for wireless networks',
-            'wificrack': 'Wireless password cracking',
-            'bluetooth': 'Bluetooth device scanning',
-            'rogue': 'Rogue AP detection',
-
-            # Password & Hash Tools
-            'hashcrack': 'Crack password hashes',
-            'hashid': 'Identify hash type',
-            'passgen': 'Generate password wordlist',
-            'bruteforce': 'Brute force attack',
-            'hydra': 'Network service bruteforce (Hydra)',
-
-            # Forensics & OSINT
+            # Web OSINT
             'emailharvest': 'Email address harvesting',
             'metadata': 'Extract file metadata',
-            'social': 'Social media OSINT',
-            'phonelookup': 'Phone number lookup',
-            'iplookup': 'IP address intelligence',
-            'breach': 'Check if email/password in breach',
-            'peoplesearch': 'People search OSINT',
+            'techstack': 'Detect web technology stack',
 
             # Reporting & Results
             'results': 'Show scan results',
