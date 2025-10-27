@@ -160,48 +160,37 @@ class MenuSystem:
         print(colored("│ Type 'target <url>' to set target, then use any web testing tool │", 'cyan'))
         print(colored("╘═══════════════════════════════════════════════════════════════════╛\n", 'cyan', attrs=['bold']))
 
-    def display_about(self):
-        """Display about information"""
-        self.clear_screen()
-        about_text = f"""
-{colored('╔════════════════════════════════════════════════════════════════╗', 'cyan')}
-{colored('║', 'cyan')}                    ABOUT CYBERGUARDIAN ULTIMATE                {colored('║', 'cyan')}
-{colored('╚════════════════════════════════════════════════════════════════╝', 'cyan')}
+    def get_system_info(self):
+        """Get system information for display"""
+        import socket
+        import requests
 
-{colored('Version:', 'yellow')} 2.0 Ultimate Edition
-{colored('Codename:', 'yellow')} "Ghost Protocol"
+        pc_name = socket.gethostname()
 
-{colored('Description:', 'yellow')}
-  CyberGuardian Ultimate is a comprehensive cybersecurity platform
-  combining offensive and defensive security tools into one powerful
-  command-line interface. Designed for penetration testers, security
-  researchers, and red/blue team operators.
+        try:
+            # Get public IP
+            public_ip = requests.get('https://api.ipify.org', timeout=2).text
+        except:
+            public_ip = "Unknown"
 
-{colored('Features:', 'yellow')}
-  • 60+ Built-in Security Tools
-  • Interactive Menu System with Auto-Correction
-  • Multi-Target Campaign Management
-  • Automated Vulnerability Scanning
-  • Advanced Web Application Testing
-  • Wireless Security Assessment
-  • Password & Hash Cracking
-  • Digital Forensics & OSINT
-  • Comprehensive Reporting
-  • Scriptable & Schedulable Scans
+        return pc_name, public_ip
 
-{colored('Legal Notice:', 'red', attrs=['bold'])}
-  This tool is for AUTHORIZED TESTING ONLY. Unauthorized access to
-  computer systems is illegal. Always obtain written permission before
-  testing any systems you do not own.
+    def display_welcome(self):
+        """Display welcome message with system info"""
+        pc_name, public_ip = self.get_system_info()
 
-{colored('Author:', 'yellow')} CyberGuardian Team
-{colored('License:', 'yellow')} For authorized security professionals only
-{colored('Website:', 'yellow')} https://github.com/NikolisSecurity/CyberToolX
+        # Right-aligned account info box
+        print(" " * 100 + colored("╒═════════════════════╕", 'cyan'))
+        print(" " * 100 + colored("│ Account Information │", 'cyan'))
+        print(" " * 100 + colored(f"│ PC-NAME: {pc_name:<10}│", 'cyan'))
+        print(" " * 100 + colored(f"│ IP: {public_ip:<14}│", 'cyan'))
+        print(" " * 100 + colored("╘═════════════════════╛", 'cyan'))
+        print()
 
-{colored('Press Enter to continue...', 'cyan')}
-        """
-        print(about_text)
-        input()
+        # Welcome message
+        print(colored(f"   Hello @{pc_name}. Welcome to MCPTool", 'white'))
+        print(colored("   To view the list of commands, type help", 'white'))
+        print()
 
     def run(self):
         """Main menu loop"""
