@@ -128,16 +128,8 @@ class MenuSystem:
             pass
 
     def display_prompt(self):
-        """Display beautiful command prompt"""
-        if self.current_target:
-            target_display = colored(f'[{self.current_target}]', 'red', attrs=['bold'])
-        else:
-            target_display = colored('[no target]', 'yellow')
-
-        prompt = f"{colored('cyber', 'cyan', attrs=['bold'])}{colored('@', 'white')}"\
-                 f"{colored('guardian', 'green', attrs=['bold'])} "\
-                 f"{target_display} {colored('>', 'red', attrs=['bold'])} "
-        return prompt
+        """Display command prompt in new style"""
+        return colored('[>] ', 'cyan', attrs=['bold'])
 
     def display_help(self, category=None):
         """Display help information"""
