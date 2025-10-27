@@ -121,7 +121,13 @@ class MenuSystem:
             'schedule': 'Schedule recurring scans',
             'monitor': 'Continuous monitoring mode',
             'honeypot': 'Deploy honeypot',
-            'custom': 'Execute custom command'
+            'custom': 'Execute custom command',
+
+            # Analytics & Metrics
+            'stats': 'Display command usage statistics',
+            'timeline': 'Show command usage timeline',
+            'performance': 'Show command performance metrics',
+            'exportstats': 'Export analytics to report file'
         }
 
         self.parser = CommandParser(self.commands)
