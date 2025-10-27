@@ -23,10 +23,82 @@
       "status": "success",
       "target": null,
       "error": null
+    },
+    {
+      "command": "help",
+      "timestamp": "2025-10-27T17:11:57.868019",
+      "duration": 0.002,
+      "status": "success",
+      "target": null,
+      "error": null
+    },
+    {
+      "command": "target",
+      "timestamp": "2025-10-27T17:11:57.868495",
+      "duration": 0.0,
+      "status": "success",
+      "target": "example.com",
+      "error": null
+    },
+    {
+      "command": "showtarget",
+      "timestamp": "2025-10-27T17:11:57.868834",
+      "duration": 0.0,
+      "status": "success",
+      "target": "example.com",
+      "error": null
+    },
+    {
+      "command": "banner",
+      "timestamp": "2025-10-27T17:11:57.871278",
+      "duration": 0.002,
+      "status": "success",
+      "target": "example.com",
+      "error": null
+    },
+    {
+      "command": "cleartarget",
+      "timestamp": "2025-10-27T17:11:57.871719",
+      "duration": 0.0,
+      "status": "success",
+      "target": null,
+      "error": null
+    },
+    {
+      "command": "target",
+      "timestamp": "2025-10-27T17:11:57.872087",
+      "duration": 0.0,
+      "status": "success",
+      "target": "192.168.1.1",
+      "error": null
+    },
+    {
+      "command": "stats",
+      "timestamp": "2025-10-27T17:11:57.874720",
+      "duration": 0.002,
+      "status": "success",
+      "target": "192.168.1.1",
+      "error": null
+    },
+    {
+      "command": "timeline",
+      "timestamp": "2025-10-27T17:11:57.877224",
+      "duration": 0.002,
+      "status": "success",
+      "target": "192.168.1.1",
+      "error": null
+    },
+    {
+      "command": "performance",
+      "timestamp": "2025-10-27T17:11:57.879544",
+      "duration": 0.002,
+      "status": "error",
+      "target": "192.168.1.1",
+      "error": "'NoneType' object is not subscriptable"
     }
   ],
   "summary": {
-    "total_commands": 3,
-    "last_updated": "2025-10-27T17:11:02.041352"
+    "total_commands": 12,
+    "last_updated": "2025-10-27T17:11:57.879544"
   }
 }
