@@ -242,8 +242,7 @@ class MenuSystem:
                 print(AsciiArt.main_banner())
             elif command in ['exit', 'quit']:
                 self.running = False
-                print(f"\n{colored('Shutting down CyberGuardian Ultimate...', 'cyan')}")
-                print(colored('Stay safe. Stay ethical. 👾\n', 'green'))
+                print(f"\n{colored('Shutting down MCPTool...', 'cyan')}\n")
             elif command == 'banner':
                 self.clear_screen()
                 print(AsciiArt.main_banner())
