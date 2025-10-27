@@ -1,0 +1,50 @@
+╔══════════════════════════════════════════════════════════════════╗
+║              CYBERGUARDIAN ANALYTICS REPORT                      ║
+╚══════════════════════════════════════════════════════════════════╝
+
+Generated: 2025-10-27T17:12:20.231622
+
+=== USAGE STATISTICS ===
+Total Commands Executed: 15
+Success Rate: 93.3%
+Failed Commands: 1
+
+=== TOP COMMANDS ===
+1. target: 4 times
+2. showtarget: 2 times
+3. cleartarget: 2 times
+4. stats: 2 times
+5. performance: 2 times
+6. help: 1 times
+7. banner: 1 times
+8. timeline: 1 times
+
+=== PERFORMANCE METRICS ===
+banner: avg=0.002s, max=0.002s, runs=1
+cleartarget: avg=0.000s, max=0.000s, runs=2
+help: avg=0.002s, max=0.002s, runs=1
+performance: avg=0.002s, max=0.002s, runs=2
+showtarget: avg=0.000s, max=0.000s, runs=2
+stats: avg=0.002s, max=0.002s, runs=2
+target: avg=0.000s, max=0.000s, runs=4
+timeline: avg=0.002s, max=0.002s, runs=1
+
+=== TIMELINE (Last 30 Days) ===
+2025-10-27: 15 commands
+
+=== FULL METRICS LOG ===
+[2025-10-27T17:11:02.040897] target: duration=0.000s, status=success, target=192.168.1.100
+[2025-10-27T17:11:02.041143] showtarget: duration=0.000s, status=success, target=192.168.1.100
+[2025-10-27T17:11:02.041352] cleartarget: duration=0.000s, status=success, target=None
+[2025-10-27T17:11:57.868019] help: duration=0.002s, status=success, target=None
+[2025-10-27T17:11:57.868495] target: duration=0.000s, status=success, target=example.com
+[2025-10-27T17:11:57.868834] showtarget: duration=0.000s, status=success, target=example.com
+[2025-10-27T17:11:57.871278] banner: duration=0.002s, status=success, target=example.com
+[2025-10-27T17:11:57.871719] cleartarget: duration=0.000s, status=success, target=None
+[2025-10-27T17:11:57.872087] target: duration=0.000s, status=success, target=192.168.1.1
+[2025-10-27T17:11:57.874720] stats: duration=0.002s, status=success, target=192.168.1.1
+[2025-10-27T17:11:57.877224] timeline: duration=0.002s, status=success, target=192.168.1.1
+[2025-10-27T17:11:57.879544] performance: duration=0.002s, status=error, target=192.168.1.1, error='NoneType' object is not subscriptable
+[2025-10-27T17:12:20.225221] target: duration=0.000s, status=success, target=test.local
+[2025-10-27T17:12:20.228039] stats: duration=0.002s, status=success, target=test.local
+[2025-10-27T17:12:20.230918] performance: duration=0.002s, status=success, target=test.local

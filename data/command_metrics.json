@@ -95,10 +95,42 @@
       "status": "error",
       "target": "192.168.1.1",
       "error": "'NoneType' object is not subscriptable"
+    },
+    {
+      "command": "target",
+      "timestamp": "2025-10-27T17:12:20.225221",
+      "duration": 0.0,
+      "status": "success",
+      "target": "test.local",
+      "error": null
+    },
+    {
+      "command": "stats",
+      "timestamp": "2025-10-27T17:12:20.228039",
+      "duration": 0.002,
+      "status": "success",
+      "target": "test.local",
+      "error": null
+    },
+    {
+      "command": "performance",
+      "timestamp": "2025-10-27T17:12:20.230918",
+      "duration": 0.002,
+      "status": "success",
+      "target": "test.local",
+      "error": null
+    },
+    {
+      "command": "exportstats",
+      "timestamp": "2025-10-27T17:12:20.232355",
+      "duration": 0.001,
+      "status": "success",
+      "target": "test.local",
+      "error": null
     }
   ],
   "summary": {
-    "total_commands": 12,
-    "last_updated": "2025-10-27T17:11:57.879544"
+    "total_commands": 16,
+    "last_updated": "2025-10-27T17:12:20.232355"
   }
 }
