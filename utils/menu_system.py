@@ -136,6 +136,91 @@ class MenuSystem:
         """Clear terminal screen"""
         os.system('clear' if os.name != 'nt' else 'cls')
 
+    def _ensure_metrics_file(self):
+        """Initialize metrics file if it doesn't exist"""
+        try:
+            if not self.metrics_file.exists():
+                # Create parent directory if needed
+                self.metrics_file.parent.mkdir(parents=True, exist_ok=True)
+                # Create initial empty structure
+                initial_data = {
+                    "metrics": [],
+                    "summary": {
+                        "total_commands": 0,
+                        "last_updated": None
+                    }
+                }
+                self.metrics_file.write_text(json.dumps(initial_data, indent=2))
+            else:
+                # Verify file is valid JSON, reset if corrupted
+                try:
+                    json.loads(self.metrics_file.read_text())
+                except json.JSONDecodeError:
+                    initial_data = {
+                        "metrics": [],
+                        "summary": {
+                            "total_commands": 0,
+                            "last_updated": None
+                        }
+                    }
+                    self.metrics_file.write_text(json.dumps(initial_data, indent=2))
+        except (OSError, PermissionError):
+            # Silently fail - don't crash program if metrics can't be initialized
+            pass
+
+    def _load_metrics(self):
+        """Load metrics from JSON file"""
+        try:
+            if self.metrics_file.exists():
+                data = json.loads(self.metrics_file.read_text())
+                return data
+            else:
+                return {
+                    "metrics": [],
+                    "summary": {
+                        "total_commands": 0,
+                        "last_updated": None
+                    }
+                }
+        except (OSError, json.JSONDecodeError, PermissionError):
+            # Return empty structure on any error
+            return {
+                "metrics": [],
+                "summary": {
+                    "total_commands": 0,
+                    "last_updated": None
+                }
+            }
+
+    def _save_metric(self, command, duration, status, error=None):
+        """Append a single metric entry"""
+        try:
+            # Load current metrics
+            data = self._load_metrics()
+
+            # Create new metric entry
+            metric_entry = {
+                "command": command,
+                "timestamp": datetime.now().isoformat(),
+                "duration": round(duration, 3),
+                "status": status,
+                "target": self.current_target,
+                "error": error
+            }
+
+            # Append to metrics list
+            data["metrics"].append(metric_entry)
+
+            # Update summary
+            data["summary"]["total_commands"] = len(data["metrics"])
+            data["summary"]["last_updated"] = metric_entry["timestamp"]
+
+            # Save back to file
+            self.metrics_file.write_text(json.dumps(data, indent=2))
+        except (OSError, PermissionError):
+            # Silently fail - don't crash program if metrics can't be saved
+            pass
+
     def display_prompt(self):
         """Display beautiful command prompt"""
         if self.current_target:
