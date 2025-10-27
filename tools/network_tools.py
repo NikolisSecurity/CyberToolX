@@ -1,12 +1,9 @@
 """Network analysis and enumeration tools"""
 
 import socket
-import subprocess
 import sys
 import os
 import dns.resolver
-import dns.zone
-import dns.query
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
