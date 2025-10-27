@@ -247,8 +247,7 @@ class MenuSystem:
             elif command == 'banner':
                 self.clear_screen()
                 print(AsciiArt.main_banner())
-            elif command == 'about':
-                self.display_about()
+                self.display_welcome()
 
             # Target management
             elif command == 'target':
