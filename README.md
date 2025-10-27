@@ -285,16 +285,16 @@ This tool is for **AUTHORIZED SECURITY TESTING ONLY**.
 
 ---
 
-## 🚀 What's New in v2.0
+## 🚀 What's New in v1.0 Web Security Edition
 
-- ✨ Interactive menu system
-- 🎨 Beautiful ASCII art & loading screens
+- ✨ Compact box-drawing interface style
+- 🌐 Focused exclusively on web application security
+- 🎨 Clean account information display with public IP
 - 🔧 Auto-correction for commands
-- 📊 60+ security tools
-- 🎯 Multi-target management
-- 📈 Real-time progress tracking
-- 🌈 Colorful cyberpunk theme
-- 📝 Enhanced reporting
+- 📊 20+ web security tools
+- 🎯 Target management system
+- 📈 Analytics & performance tracking
+- 🕵️ Web-focused OSINT capabilities
 
 ---
 
