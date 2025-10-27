@@ -96,14 +96,14 @@ python3 main.py
 git clone https://github.com/NikolisSecurity/CyberToolX.git
 cd CyberToolX
 
-# Install system dependencies
+# Install system dependencies (minimal)
 sudo apt update
-sudo apt install nmap whois traceroute dnsutils -y
+sudo apt install dnsutils -y
 
 # Install Python dependencies
 pip3 install -r requirements.txt
 
-# Launch CyberGuardian
+# Launch NPS Tool
 python3 main.py
 ```
 
