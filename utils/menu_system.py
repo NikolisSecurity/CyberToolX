@@ -218,36 +218,38 @@ class MenuSystem:
         self.clear_screen()
         about_text = f"""
 {colored('╔════════════════════════════════════════════════════════════════╗', 'cyan')}
-{colored('║', 'cyan')}                    ABOUT CYBERGUARDIAN ULTIMATE                {colored('║', 'cyan')}
+{colored('║', 'cyan')}                         ABOUT NPS TOOL                         {colored('║', 'cyan')}
 {colored('╚════════════════════════════════════════════════════════════════╝', 'cyan')}
 
-{colored('Version:', 'yellow')} 2.0 Ultimate Edition
-{colored('Codename:', 'yellow')} "Ghost Protocol"
+{colored('Version:', 'yellow')} 1.0 Web Security Edition
 
 {colored('Description:', 'yellow')}
-  CyberGuardian Ultimate is a comprehensive cybersecurity platform
-  combining offensive and defensive security tools into one powerful
-  command-line interface. Designed for penetration testers, security
-  researchers, and red/blue team operators.
+  NPS Tool (Network Pentesting Suite) is a specialized web application
+  security testing platform designed for penetration testers and security
+  researchers. Focused exclusively on web vulnerabilities, subdomain
+  enumeration, and web-based reconnaissance.
 
 {colored('Features:', 'yellow')}
-  • 60+ Built-in Security Tools
-  • Interactive Menu System with Auto-Correction
-  • Multi-Target Campaign Management
-  • Automated Vulnerability Scanning
-  • Advanced Web Application Testing
-  • Wireless Security Assessment
-  • Password & Hash Cracking
-  • Digital Forensics & OSINT
+  • 20+ Web Security Testing Tools
+  • Interactive Command Interface
+  • Target Management System
+  • SQL Injection Testing
+  • XSS & CSRF Detection
+  • SSL/TLS Security Analysis
+  • WAF Detection & Fingerprinting
+  • CMS & Technology Stack Detection
+  • API & GraphQL Testing
+  • Subdomain Enumeration
+  • Web-focused OSINT Tools
   • Comprehensive Reporting
-  • Scriptable & Schedulable Scans
+  • Analytics & Performance Tracking
 
 {colored('Legal Notice:', 'red', attrs=['bold'])}
   This tool is for AUTHORIZED TESTING ONLY. Unauthorized access to
   computer systems is illegal. Always obtain written permission before
   testing any systems you do not own.
 
-{colored('Author:', 'yellow')} CyberGuardian Team
+{colored('Author:', 'yellow')} NPS Development Team
 {colored('License:', 'yellow')} For authorized security professionals only
 {colored('Website:', 'yellow')} https://github.com/NikolisSecurity/CyberToolX
 
