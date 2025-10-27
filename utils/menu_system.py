@@ -199,9 +199,9 @@ class MenuSystem:
         AsciiArt.loading_screen()
         self.clear_screen()
 
-        # Show main banner
+        # Show main banner with system info and welcome
         print(AsciiArt.main_banner())
-        print(colored("  Type 'help' for available commands | Type 'exit' to quit\n", 'cyan'))
+        self.display_welcome()
 
         while self.running:
             try:
