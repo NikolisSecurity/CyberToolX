@@ -1,9 +1,10 @@
-"""Interactive menu system for CyberGuardian Ultimate"""
+"""Interactive menu system for NPS Tool"""
 
 import os
 import sys
 import json
 import time
+import getpass
 from datetime import datetime
 from pathlib import Path
 from .color_compat import colored
