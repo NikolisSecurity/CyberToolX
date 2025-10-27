@@ -171,7 +171,7 @@ To view the list of commands, type help
 | `help` | Display all available commands with descriptions |
 | `clear` | Clear the screen |
 | `banner` | Display the main banner |
-| `about` | About CyberGuardian Ultimate |
+| `about` | About NPS Tool |
 | `exit` / `quit` | Exit the application |
 
 ### Target Management
