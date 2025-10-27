@@ -46,47 +46,6 @@ class OSINTTools:
             AsciiArt.error_message(f"Email harvesting failed: {str(e)}")
             return []
 
-    def social_links(self):
-        """Find social media links"""
-        print(f"\n{colored('Finding social media links...', 'cyan')}")
-
-        social_platforms = {
-            'Twitter': r'(https?://(?:www\.)?twitter\.com/[a-zA-Z0-9_]+)',
-            'Facebook': r'(https?://(?:www\.)?facebook\.com/[a-zA-Z0-9.]+)',
-            'LinkedIn': r'(https?://(?:www\.)?linkedin\.com/(?:in|company)/[a-zA-Z0-9-]+)',
-            'Instagram': r'(https?://(?:www\.)?instagram\.com/[a-zA-Z0-9_.]+)',
-            'GitHub': r'(https?://(?:www\.)?github\.com/[a-zA-Z0-9-]+)',
-            'YouTube': r'(https?://(?:www\.)?youtube\.com/(?:c|channel|user)/[a-zA-Z0-9_-]+)'
-        }
-
-        try:
-            target_url = self.target if self.target.startswith('http') else f'http://{self.target}'
-            response = requests.get(target_url, timeout=10)
-
-            found_links = {}
-
-            for platform, pattern in social_platforms.items():
-                matches = set(re.findall(pattern, response.text))
-                if matches:
-                    found_links[platform] = list(matches)
-
-            if found_links:
-                print(f"\n{colored('Social Media Links Found:', 'green', attrs=['bold'])}\n")
-                for platform, links in found_links.items():
-                    print(f"{colored(platform, 'cyan')}:")
-                    for link in links:
-                        print(f"  🔗 {link}")
-                    print()
-                AsciiArt.success_message("Social media discovery completed")
-            else:
-                AsciiArt.info_message("No social media links found")
-
-            return found_links
-
-        except Exception as e:
-            AsciiArt.error_message(f"Social media scan failed: {str(e)}")
-            return {}
-
     def metadata_extract(self, url):
         """Extract metadata from web page"""
         print(f"\n{colored('Extracting metadata...', 'cyan')}")

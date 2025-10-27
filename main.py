@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-CyberGuardian Ultimate v2.0 - Interactive Edition
-Advanced Cybersecurity Warfare Platform
+NPS Tool v1.0 - Web Security Edition
+Network Pentesting Suite
 
-Interactive menu-driven interface with 60+ security tools
+Interactive menu-driven interface for web security testing
 Type 'help' for available commands
 """
 
@@ -20,7 +20,7 @@ from utils.menu_system import MenuSystem
 
 
 def main():
-    """Launch CyberGuardian Ultimate interactive interface"""
+    """Launch NPS Tool interactive interface"""
     try:
         menu = MenuSystem()
         menu.run()

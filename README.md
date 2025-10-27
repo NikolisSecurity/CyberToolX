@@ -1,13 +1,13 @@
-# 🛡️ CyberGuardian Ultimate v2.0
+# 🌐 NPS Tool v1.0
 
-**Advanced Interactive Cybersecurity Warfare Platform**
+**Network Pentesting Suite - Web Security Edition**
 
-[![Version](https://img.shields.io/badge/version-2.0-blue.svg)](https://github.com/NikolisSecurity/CyberToolX)
+[![Version](https://img.shields.io/badge/version-1.0-blue.svg)](https://github.com/NikolisSecurity/CyberToolX)
 [![Python](https://img.shields.io/badge/python-3.8+-green.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-Authorized%20Use%20Only-red.svg)](LICENSE)
 [![Status](https://img.shields.io/badge/status-working-brightgreen.svg)](#)
 
-> *The ultimate command-line cybersecurity toolkit with interactive menu, auto-correction, and 25+ working security tools*
+> *Specialized web application security testing platform with 20+ web-focused security tools*
 
 ---
 
@@ -18,21 +18,21 @@ cd /workspace/cmh8969s900cor7i3v4rbn8n9/CyberToolX
 python3 main.py
 ```
 
-**That's it!** The tool works out of the box with 25+ commands ready to use.
+**That's it!** The tool works out of the box with 20+ commands ready to use.
 
 ### Example Session
 ```bash
-cyber@guardian [no target] > target example.com
+[>] target example.com
 ✓ Target set to: example.com
 
-cyber@guardian [example.com] > dnsenum
+[>] dnsenum
 # DNS enumeration results...
 
-cyber@guardian [example.com] > headerscan
+[>] headerscan
 # Security headers analysis...
 
-cyber@guardian [example.com] > help
-# Shows all 60+ available commands
+[>] help
+# Shows all available web security commands
 ```
 
 ---
@@ -40,69 +40,45 @@ cyber@guardian [example.com] > help
 ## ⚡ Features
 
 ### 🎨 **Beautiful Interactive Interface**
-- **Matrix-style loading screen** with animated effects
+- **Compact box-drawing style banner** with account information
 - **Command auto-correction** - never type a command wrong again
-- **Colorful menus** with cyberpunk aesthetics
+- **Colorful terminal interface** with clean aesthetics
 - **Real-time progress indicators** for all scans
 - **Multi-target management** - switch between targets seamlessly
 
-### 🔍 **60+ Security Tools in 6 Categories**
+### 🔍 **20+ Web Security Tools**
 
-#### 1️⃣ **Reconnaissance & Enumeration**
-- Quick/Deep Port Scanning (1-65535 ports)
-- Service Version Detection
-- Vulnerability Scanning with NSE scripts
-- Advanced Nmap integration
-- Network mapping and discovery
-
-#### 2️⃣ **Network Analysis**
-- DNS Enumeration (A, AAAA, MX, NS, TXT, SOA, CNAME)
-- Subdomain Discovery (30+ common subdomains)
-- DNS Zone Transfer Detection
-- WHOIS Lookup
-- Reverse DNS
-- GeoIP Location
-- Traceroute Analysis
-- ICMP Ping Testing
-
-#### 3️⃣ **Web Application Testing**
+#### 🌐 **Web Application Testing**
 - Security Headers Analysis (HSTS, CSP, X-Frame-Options, etc.)
 - SSL/TLS Configuration Scanning
 - Certificate Analysis & Expiry Checking
 - WAF/CDN Detection (Cloudflare, Akamai, AWS, F5, etc.)
 - CMS Detection (WordPress, Joomla, Drupal, etc.)
-- Directory Enumeration
 - robots.txt & sitemap.xml Analysis
 - Technology Stack Detection
 - API Endpoint Discovery
-- SQL Injection Testing
-- XSS Testing
-- CSRF Testing
+- SQL Injection Testing (placeholder)
+- XSS Testing (placeholder)
+- CSRF Testing (placeholder)
+- GraphQL Testing (placeholder)
+- JWT Analysis (placeholder)
 
-#### 4️⃣ **OSINT & Intelligence**
-- Email Harvesting
-- Social Media Link Discovery
-- Metadata Extraction
+#### 🔍 **DNS & Subdomain**
+- DNS Enumeration (A, AAAA, MX, NS, TXT, SOA, CNAME)
+- Subdomain Discovery (30+ common subdomains)
+
+#### 🕵️ **Web OSINT**
+- Email Harvesting from websites
+- Metadata Extraction from web pages
 - Technology Fingerprinting
-- People Search
-- Phone Number Lookup
-- Breach Database Checking
 
-#### 5️⃣ **Exploitation Tools**
-- Exploit Database Search
-- Metasploit Integration
-- Reverse Shell Generator
-- Payload Generator
-- Custom Exploit Execution
-
-#### 6️⃣ **Reporting & Analysis**
-- Comprehensive HTML Reports
-- JSON Export
-- CSV Export
-- XML Export
+#### 📊 **Reporting & Analysis**
+- Scan Results Display
+- Report Generation
+- Export to File
 - Scan History
 - Result Comparison
-- Visual Charts & Graphs
+- Analytics & Performance Tracking
 
 ---
 
@@ -120,14 +96,14 @@ cyber@guardian [example.com] > help
 git clone https://github.com/NikolisSecurity/CyberToolX.git
 cd CyberToolX
 
-# Install system dependencies
+# Install system dependencies (minimal)
 sudo apt update
-sudo apt install nmap whois traceroute dnsutils -y
+sudo apt install dnsutils -y
 
 # Install Python dependencies
 pip3 install -r requirements.txt
 
-# Launch CyberGuardian
+# Launch NPS Tool
 python3 main.py
 ```
 
@@ -140,37 +116,48 @@ python3 main.py
 python3 main.py
 ```
 
-You'll see a beautiful loading screen, then the main interface:
+You'll see a loading screen with web security module initialization, then the main interface:
 
 ```
-╔═══════════════════════════════════════════════════════════════════════════════╗
-║                    ULTIMATE CYBER WARFARE PLATFORM v2.0                       ║
-╚═══════════════════════════════════════════════════════════════════════════════╝
+╒═════════════════════╕
+│ Account Information │
+│ Target: Not Set     │
+│ IP: 203.0.113.45    │
+╘═════════════════════╛
 
-Type 'help' for available commands | Type 'exit' to quit
+══╦═════════════════════════════════════╦══
+╔════════════════════════════════════════╗
+│  NPS Tool                              │
+│  Advanced Web Security Testing         │
+╚════════════════════════════════════════╝
 
-cyber@guardian [no target] >
+Hello @username. Welcome to NPS Tool
+To view the list of commands, type help
+
+[>]
 ```
 
 ### Basic Workflow
 
 ```bash
 # 1. Set your target
-cyber@guardian [no target] > target scanme.nmap.org
+[>] target example.com
 
-✓ Target set to: scanme.nmap.org
+✓ Target set to: example.com
 
-# 2. Run a quick scan
-cyber@guardian [scanme.nmap.org] > quickscan
+# 2. Run web security scans
+[>] headerscan
+[>] sslscan
+[>] wafscan
 
-# 3. Check for vulnerabilities
-cyber@guardian [scanme.nmap.org] > vulnscan
+# 3. Enumerate subdomains
+[>] subdomain
 
 # 4. View results
-cyber@guardian [scanme.nmap.org] > results
+[>] results
 
 # 5. Exit
-cyber@guardian [scanme.nmap.org] > exit
+[>] exit
 ```
 
 ---
@@ -184,7 +171,7 @@ cyber@guardian [scanme.nmap.org] > exit
 | `help` | Display all available commands with descriptions |
 | `clear` | Clear the screen |
 | `banner` | Display the main banner |
-| `about` | About CyberGuardian Ultimate |
+| `about` | About NPS Tool |
 | `exit` / `quit` | Exit the application |
 
 ### Target Management
@@ -195,56 +182,44 @@ cyber@guardian [scanme.nmap.org] > exit
 | `showtarget` | Display current target | `showtarget` |
 | `cleartarget` | Clear current target | `cleartarget` |
 
-### Reconnaissance (12 tools)
-
-- `quickscan` - Quick scan of top 100 ports
-- `deepscan` - Deep scan of all 65535 ports
-- `servicescan` - Service version detection
-- `vulnscan` - Vulnerability scanning
-- `nmap` - Advanced nmap options
-- `ping` - ICMP ping test
-- `traceroute` - Trace route to target
-- `portscan` - Full port scanning
-- `portsweep` - Multiple host sweep
-
-### Network Analysis (9 tools)
-
-- `dnsenum` - DNS enumeration
-- `subdomain` - Subdomain discovery
-- `dnszone` - DNS zone transfer
-- `whois` - WHOIS lookup
-- `reverse` - Reverse DNS
-- `geoip` - Geolocation
-
 ### Web Testing (13 tools)
 
-- `webscan` - Complete web scan
-- `headerscan` - Security headers
+- `webscan` - Complete web scan (placeholder)
+- `headerscan` - Security headers analysis
 - `sslscan` - SSL/TLS analysis
 - `wafscan` - WAF detection
 - `cmsscan` - CMS detection
 - `robots` - robots.txt check
-- `dirscan` - Directory enum
-- `apiscan` - API discovery
-- `sqlmap` - SQL injection
-- `xsstest` - XSS testing
+- `dirscan` - Directory enumeration (placeholder)
+- `apiscan` - API discovery (placeholder)
+- `sqlmap` - SQL injection (placeholder)
+- `xsstest` - XSS testing (placeholder)
+- `csrftest` - CSRF testing (placeholder)
+- `graphql` - GraphQL testing (placeholder)
+- `jwtscan` - JWT analysis (placeholder)
 
-### OSINT (7 tools)
+### DNS & Subdomain (2 tools)
+
+- `dnsenum` - DNS enumeration
+- `subdomain` - Subdomain discovery
+
+### Web OSINT (3 tools)
 
 - `emailharvest` - Email harvesting
-- `social` - Social media links
 - `metadata` - Metadata extraction
 - `techstack` - Technology detection
-- `breach` - Breach checking
-- `peoplesearch` - People OSINT
 
-### Results (5 tools)
+### Reporting & Analytics (9 tools)
 
 - `results` - Show all results
-- `report` - Generate report
-- `export` - Export to file
-- `history` - Scan history
-- `compare` - Compare scans
+- `report` - Generate report (placeholder)
+- `export` - Export to file (placeholder)
+- `history` - Scan history (placeholder)
+- `compare` - Compare scans (placeholder)
+- `stats` - Usage statistics
+- `timeline` - Command timeline
+- `performance` - Performance metrics
+- `exportstats` - Export analytics
 
 ---
 
@@ -255,22 +230,24 @@ cyber@guardian [scanme.nmap.org] > exit
 ```bash
 python3 main.py
 
-cyber@guardian [no target] > target https://example.com
-cyber@guardian [https://example.com] > quickscan
-cyber@guardian [https://example.com] > headerscan
-cyber@guardian [https://example.com] > sslscan
-cyber@guardian [https://example.com] > results
+[>] target https://example.com
+[>] headerscan
+[>] sslscan
+[>] wafscan
+[>] cmsscan
+[>] results
 ```
 
-### Example 2: Network Assessment
+### Example 2: Comprehensive Web Assessment
 
 ```bash
-cyber@guardian [no target] > target company.com
-cyber@guardian [company.com] > dnsenum
-cyber@guardian [company.com] > subdomain
-cyber@guardian [company.com] > deepscan
-cyber@guardian [company.com] > vulnscan
-cyber@guardian [company.com] > report
+[>] target company.com
+[>] dnsenum
+[>] subdomain
+[>] techstack
+[>] emailharvest
+[>] robots
+[>] stats
 ```
 
 ---
@@ -280,11 +257,10 @@ cyber@guardian [company.com] > report
 ### Auto-Correction
 
 ```bash
-cyber@guardian [target] > quckscan
+[>] hel
 
-Did you mean: quickscan?
-[y/n]: y
-✓ Using: quickscan
+Command "hel" is not valid.
+Did you mean: help?
 ```
 
 ### Beautiful Output
@@ -309,16 +285,16 @@ This tool is for **AUTHORIZED SECURITY TESTING ONLY**.
 
 ---
 
-## 🚀 What's New in v2.0
+## 🚀 What's New in v1.0 Web Security Edition
 
-- ✨ Interactive menu system
-- 🎨 Beautiful ASCII art & loading screens
+- ✨ Compact box-drawing interface style
+- 🌐 Focused exclusively on web application security
+- 🎨 Clean account information display with public IP
 - 🔧 Auto-correction for commands
-- 📊 60+ security tools
-- 🎯 Multi-target management
-- 📈 Real-time progress tracking
-- 🌈 Colorful cyberpunk theme
-- 📝 Enhanced reporting
+- 📊 20+ web security tools
+- 🎯 Target management system
+- 📈 Analytics & performance tracking
+- 🕵️ Web-focused OSINT capabilities
 
 ---
 

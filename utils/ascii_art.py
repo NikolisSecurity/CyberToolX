@@ -1,39 +1,54 @@
-"""Enhanced ASCII art for CyberGuardian Ultimate"""
+"""Enhanced ASCII art for NPS Tool"""
 
 from .color_compat import colored
 import time
 import sys
 import random
+import requests
+import getpass
 
 
 class AsciiArt:
     """Beautiful ASCII art for the cybersecurity platform"""
 
     @staticmethod
-    def main_banner():
-        """Main banner with cyberpunk style"""
-        banner = """
-╔═══════════════════════════════════════════════════════════════════════════════╗
-║                                                                               ║
-║   ██████╗██╗   ██╗██████╗ ███████╗██████╗  ██████╗ ██╗   ██╗ █████╗ ██████╗  ║
-║  ██╔════╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗██╔════╝ ██║   ██║██╔══██╗██╔══██╗ ║
-║  ██║      ╚████╔╝ ██████╔╝█████╗  ██████╔╝██║  ███╗██║   ██║███████║██████╔╝ ║
-║  ██║       ╚██╔╝  ██╔══██╗██╔══╝  ██╔══██╗██║   ██║██║   ██║██╔══██║██╔══██╗ ║
-║  ╚██████╗   ██║   ██████╔╝███████╗██║  ██║╚██████╔╝╚██████╔╝██║  ██║██║  ██║ ║
-║   ╚═════╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝ ║
-║                                                                               ║
-║                    ██╗   ██╗██╗  ████████╗██╗███╗   ███╗ █████╗ ████████╗███████╗║
-║                    ██║   ██║██║  ╚══██╔══╝██║████╗ ████║██╔══██╗╚══██╔══╝██╔════╝║
-║                    ██║   ██║██║     ██║   ██║██╔████╔██║███████║   ██║   █████╗  ║
-║                    ██║   ██║██║     ██║   ██║██║╚██╔╝██║██╔══██║   ██║   ██╔══╝  ║
-║                    ╚██████╔╝███████╗██║   ██║██║ ╚═╝ ██║██║  ██║   ██║   ███████╗║
-║                     ╚═════╝ ╚══════╝╚═╝   ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝   ╚═╝   ╚══════╝║
-║                                                                               ║
-║                     『 ULTIMATE CYBER WARFARE PLATFORM v2.0 』                 ║
-║                                                                               ║
-╚═══════════════════════════════════════════════════════════════════════════════╝
-"""
-        return colored(banner, 'cyan', attrs=['bold'])
+    def get_public_ip():
+        """Fetch public IP address from ipify.org API"""
+        try:
+            response = requests.get('https://api.ipify.org?format=json', timeout=3)
+            return response.json()['ip']
+        except Exception:
+            return "Unavailable"
+
+    @staticmethod
+    def main_banner(target=None):
+        """Main banner with compact box-drawing style"""
+        # Get target display
+        target_display = target if target else "Not Set"
+
+        # Fetch public IP
+        public_ip = AsciiArt.get_public_ip()
+
+        # Build account info box
+        account_box = f"""╒═════════════════════╕
+│ Account Information │
+│ Target: {target_display:<11} │
+│ IP: {public_ip:<15} │
+╘═════════════════════╛"""
+
+        # Horizontal separator
+        separator = "\n══╦═════════════════════════════════════╦══"
+
+        # Tool title box
+        title_box = """╔════════════════════════════════════════╗
+│  NPS Tool                              │
+│  Advanced Web Security Testing         │
+╚════════════════════════════════════════╝"""
+
+        # Combine all parts
+        banner = colored(account_box, 'cyan') + colored(separator, 'cyan') + "\n" + colored(title_box, 'cyan')
+
+        return banner
 
     @staticmethod
     def loading_screen():
@@ -74,28 +89,26 @@ class AsciiArt:
         ]
 
         loading_messages = [
-            "Initializing quantum encryption modules",
-            "Loading neural network exploit database",
-            "Calibrating packet injection systems",
-            "Establishing secure darknet connections",
-            "Compiling zero-day vulnerability signatures",
-            "Activating stealth reconnaissance protocols",
-            "Synchronizing with global threat intelligence",
-            "Deploying advanced penetration frameworks"
+            "Initializing web vulnerability scanners",
+            "Loading SSL/TLS analysis modules",
+            "Preparing SQL injection testers",
+            "Loading XSS detection engine",
+            "Initializing header security scanner",
+            "Loading WAF detection system"
         ]
 
         colors = ['red', 'yellow', 'green', 'cyan', 'magenta']
 
-        for i in range(8):
+        for i in range(6):
             sys.stdout.write('\033[2J\033[H')  # Clear screen
             frame = frames[i % len(frames)]
             color = colors[i % len(colors)]
             print(colored(frame, color, attrs=['bold']))
 
             # Progress bar
-            progress = int((i + 1) / 8 * 50)
+            progress = int((i + 1) / 6 * 50)
             bar = '█' * progress + '░' * (50 - progress)
-            print(f"\n    [{colored(bar, color)}] {int((i + 1) / 8 * 100)}%")
+            print(f"\n    [{colored(bar, color)}] {int((i + 1) / 6 * 100)}%")
 
             # Loading message
             if i < len(loading_messages):
@@ -108,7 +121,7 @@ class AsciiArt:
         sys.stdout.write('\033[2J\033[H')
         print(colored(frames[-1], 'green', attrs=['bold']))
         print(f"\n    [{colored('█' * 50, 'green')}] 100%")
-        print(f"\n    {colored('✓', 'green', attrs=['bold'])} System ready. All modules loaded successfully.")
+        print(f"\n    {colored('✓', 'green', attrs=['bold'])} System ready - Web security modules loaded.")
         time.sleep(1)
 
     @staticmethod

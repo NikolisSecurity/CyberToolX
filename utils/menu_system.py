@@ -1,9 +1,10 @@
-"""Interactive menu system for CyberGuardian Ultimate"""
+"""Interactive menu system for NPS Tool"""
 
 import os
 import sys
 import json
 import time
+import getpass
 from datetime import datetime
 from pathlib import Path
 from .color_compat import colored
@@ -28,34 +29,15 @@ class MenuSystem:
             # Main Menu
             'help': 'Display available commands and usage',
             'clear': 'Clear the screen',
-            'exit': 'Exit CyberGuardian Ultimate',
-            'quit': 'Exit CyberGuardian Ultimate',
+            'exit': 'Exit NPS Tool',
+            'quit': 'Exit NPS Tool',
             'banner': 'Display the main banner',
-            'about': 'About CyberGuardian Ultimate',
+            'about': 'About NPS Tool',
 
             # Target Management
             'target': 'Set target for scanning (usage: target <ip/domain>)',
             'showtarget': 'Display current target',
             'cleartarget': 'Clear current target',
-
-            # Reconnaissance Tools
-            'portscan': 'Comprehensive port scanning',
-            'quickscan': 'Quick scan of common ports',
-            'deepscan': 'Deep scan of all 65535 ports',
-            'servicescan': 'Service version detection',
-            'vulnscan': 'Vulnerability scanning',
-            'nmap': 'Advanced nmap scanning with custom options',
-
-            # Network Analysis
-            'ping': 'ICMP ping test',
-            'traceroute': 'Trace route to target',
-            'dnsenum': 'DNS enumeration',
-            'dnszone': 'DNS zone transfer attempt',
-            'subdomain': 'Subdomain enumeration',
-            'whois': 'WHOIS lookup',
-            'geoip': 'Geolocation lookup',
-            'reverse': 'Reverse DNS lookup',
-            'portsweep': 'Sweep multiple hosts for open ports',
 
             # Web Application Testing
             'webscan': 'Complete web application scan',
@@ -72,34 +54,14 @@ class MenuSystem:
             'jwtscan': 'JWT token analysis',
             'robots': 'Check robots.txt and sitemap.xml',
 
-            # Exploitation
-            'exploitsearch': 'Search for exploits',
-            'metasploit': 'Metasploit integration',
-            'shellgen': 'Reverse shell generator',
-            'payloadgen': 'Payload generator',
-            'exploit': 'Execute exploit module',
+            # DNS/Subdomain
+            'dnsenum': 'DNS enumeration',
+            'subdomain': 'Subdomain enumeration',
 
-            # Wireless Security
-            'wifiscan': 'Scan for wireless networks',
-            'wificrack': 'Wireless password cracking',
-            'bluetooth': 'Bluetooth device scanning',
-            'rogue': 'Rogue AP detection',
-
-            # Password & Hash Tools
-            'hashcrack': 'Crack password hashes',
-            'hashid': 'Identify hash type',
-            'passgen': 'Generate password wordlist',
-            'bruteforce': 'Brute force attack',
-            'hydra': 'Network service bruteforce (Hydra)',
-
-            # Forensics & OSINT
+            # Web OSINT
             'emailharvest': 'Email address harvesting',
             'metadata': 'Extract file metadata',
-            'social': 'Social media OSINT',
-            'phonelookup': 'Phone number lookup',
-            'iplookup': 'IP address intelligence',
-            'breach': 'Check if email/password in breach',
-            'peoplesearch': 'People search OSINT',
+            'techstack': 'Detect web technology stack',
 
             # Reporting & Results
             'results': 'Show scan results',
@@ -222,16 +184,8 @@ class MenuSystem:
             pass
 
     def display_prompt(self):
-        """Display beautiful command prompt"""
-        if self.current_target:
-            target_display = colored(f'[{self.current_target}]', 'red', attrs=['bold'])
-        else:
-            target_display = colored('[no target]', 'yellow')
-
-        prompt = f"{colored('cyber', 'cyan', attrs=['bold'])}{colored('@', 'white')}"\
-                 f"{colored('guardian', 'green', attrs=['bold'])} "\
-                 f"{target_display} {colored('>', 'red', attrs=['bold'])} "
-        return prompt
+        """Display command prompt"""
+        return colored('[>] ', 'green')
 
     def display_help(self, category=None):
         """Display help information"""
@@ -241,13 +195,9 @@ class MenuSystem:
         categories = {
             'Main': ['help', 'clear', 'exit', 'quit', 'banner', 'about'],
             'Target Management': ['target', 'showtarget', 'cleartarget'],
-            'Reconnaissance': ['portscan', 'quickscan', 'deepscan', 'servicescan', 'vulnscan', 'nmap'],
-            'Network Analysis': ['ping', 'traceroute', 'dnsenum', 'dnszone', 'subdomain', 'whois', 'geoip', 'reverse', 'portsweep'],
             'Web Testing': ['webscan', 'dirscan', 'sqlmap', 'xsstest', 'csrftest', 'headerscan', 'sslscan', 'wafscan', 'cmsscan', 'apiscan', 'graphql', 'jwtscan', 'robots'],
-            'Exploitation': ['exploitsearch', 'metasploit', 'shellgen', 'payloadgen', 'exploit'],
-            'Wireless': ['wifiscan', 'wificrack', 'bluetooth', 'rogue'],
-            'Password Tools': ['hashcrack', 'hashid', 'passgen', 'bruteforce', 'hydra'],
-            'Forensics & OSINT': ['emailharvest', 'metadata', 'social', 'phonelookup', 'iplookup', 'breach', 'peoplesearch'],
+            'DNS & Subdomain': ['dnsenum', 'subdomain'],
+            'Web OSINT': ['emailharvest', 'metadata', 'techstack'],
             'Reporting': ['results', 'report', 'export', 'history', 'compare'],
             'Configuration': ['settings', 'proxy', 'threads', 'timeout', 'verbose', 'update'],
             'Analytics': ['stats', 'timeline', 'performance', 'exportstats'],
@@ -268,36 +218,38 @@ class MenuSystem:
         self.clear_screen()
         about_text = f"""
 {colored('╔════════════════════════════════════════════════════════════════╗', 'cyan')}
-{colored('║', 'cyan')}                    ABOUT CYBERGUARDIAN ULTIMATE                {colored('║', 'cyan')}
+{colored('║', 'cyan')}                         ABOUT NPS TOOL                         {colored('║', 'cyan')}
 {colored('╚════════════════════════════════════════════════════════════════╝', 'cyan')}
 
-{colored('Version:', 'yellow')} 2.0 Ultimate Edition
-{colored('Codename:', 'yellow')} "Ghost Protocol"
+{colored('Version:', 'yellow')} 1.0 Web Security Edition
 
 {colored('Description:', 'yellow')}
-  CyberGuardian Ultimate is a comprehensive cybersecurity platform
-  combining offensive and defensive security tools into one powerful
-  command-line interface. Designed for penetration testers, security
-  researchers, and red/blue team operators.
+  NPS Tool (Network Pentesting Suite) is a specialized web application
+  security testing platform designed for penetration testers and security
+  researchers. Focused exclusively on web vulnerabilities, subdomain
+  enumeration, and web-based reconnaissance.
 
 {colored('Features:', 'yellow')}
-  • 60+ Built-in Security Tools
-  • Interactive Menu System with Auto-Correction
-  • Multi-Target Campaign Management
-  • Automated Vulnerability Scanning
-  • Advanced Web Application Testing
-  • Wireless Security Assessment
-  • Password & Hash Cracking
-  • Digital Forensics & OSINT
+  • 20+ Web Security Testing Tools
+  • Interactive Command Interface
+  • Target Management System
+  • SQL Injection Testing
+  • XSS & CSRF Detection
+  • SSL/TLS Security Analysis
+  • WAF Detection & Fingerprinting
+  • CMS & Technology Stack Detection
+  • API & GraphQL Testing
+  • Subdomain Enumeration
+  • Web-focused OSINT Tools
   • Comprehensive Reporting
-  • Scriptable & Schedulable Scans
+  • Analytics & Performance Tracking
 
 {colored('Legal Notice:', 'red', attrs=['bold'])}
   This tool is for AUTHORIZED TESTING ONLY. Unauthorized access to
   computer systems is illegal. Always obtain written permission before
   testing any systems you do not own.
 
-{colored('Author:', 'yellow')} CyberGuardian Team
+{colored('Author:', 'yellow')} NPS Development Team
 {colored('License:', 'yellow')} For authorized security professionals only
 {colored('Website:', 'yellow')} https://github.com/NikolisSecurity/CyberToolX
 
@@ -314,8 +266,17 @@ class MenuSystem:
         self.clear_screen()
 
         # Show main banner
-        print(AsciiArt.main_banner())
-        print(colored("  Type 'help' for available commands | Type 'exit' to quit\n", 'cyan'))
+        print(AsciiArt.main_banner(self.current_target))
+
+        # Welcome message with username
+        try:
+            username = getpass.getuser()
+        except Exception:
+            username = "User"
+
+        print(colored(f"Hello @{username}. Welcome to NPS Tool", 'cyan'))
+        print(colored("To view the list of commands, type help", 'cyan'))
+        print()
 
         while self.running:
             try:
@@ -353,14 +314,14 @@ class MenuSystem:
                 self.display_help()
             elif command == 'clear':
                 self.clear_screen()
-                print(AsciiArt.main_banner())
+                print(AsciiArt.main_banner(self.current_target))
             elif command in ['exit', 'quit']:
                 self.running = False
-                print(f"\n{colored('Shutting down CyberGuardian Ultimate...', 'cyan')}")
+                print(f"\n{colored('Shutting down NPS Tool...', 'cyan')}")
                 print(colored('Stay safe. Stay ethical. 👾\n', 'green'))
             elif command == 'banner':
                 self.clear_screen()
-                print(AsciiArt.main_banner())
+                print(AsciiArt.main_banner(self.current_target))
             elif command == 'about':
                 self.display_about()
 
@@ -407,48 +368,18 @@ class MenuSystem:
 
     def execute_tool(self, tool, args):
         """Execute a security tool"""
-        if not self.current_target and tool not in ['hashid', 'hashcrack', 'passgen', 'settings', 'update']:
+        if not self.current_target and tool not in ['settings', 'update']:
             AsciiArt.error_message("No target set. Use 'target <ip/domain>' first.")
             return
 
         try:
             # Import tools
-            from tools.recon_tools import ReconTools
             from tools.web_tools import WebTools
             from tools.network_tools import NetworkTools
             from tools.osint_tools import OSINTTools
 
-            # Reconnaissance tools
-            if tool == 'quickscan':
-                recon = ReconTools(self.current_target)
-                results = recon.quick_scan()
-                self.scan_results['quickscan'] = results
-
-            elif tool == 'deepscan':
-                recon = ReconTools(self.current_target)
-                results = recon.deep_scan()
-                self.scan_results['deepscan'] = results
-
-            elif tool == 'servicescan':
-                recon = ReconTools(self.current_target)
-                results = recon.service_scan()
-                self.scan_results['servicescan'] = results
-
-            elif tool == 'vulnscan':
-                recon = ReconTools(self.current_target)
-                results = recon.vuln_scan()
-                self.scan_results['vulnscan'] = results
-
-            elif tool == 'ping':
-                recon = ReconTools(self.current_target)
-                recon.ping_test()
-
-            elif tool == 'traceroute':
-                recon = ReconTools(self.current_target)
-                recon.traceroute()
-
             # Web application tools
-            elif tool == 'headerscan':
+            if tool == 'headerscan':
                 web = WebTools(self.current_target)
                 results = web.headers_scan()
                 self.scan_results['headerscan'] = results
@@ -472,38 +403,21 @@ class MenuSystem:
                 results = web.cms_detect()
                 self.scan_results['cmsscan'] = results
 
-            # Network tools
+            # Network tools (DNS/subdomain only)
             elif tool == 'dnsenum':
                 net = NetworkTools(self.current_target)
                 net.dns_enum()
-
-            elif tool == 'whois':
-                net = NetworkTools(self.current_target)
-                net.whois_lookup()
-
-            elif tool == 'reverse':
-                net = NetworkTools(self.current_target)
-                net.reverse_dns()
 
             elif tool == 'subdomain':
                 net = NetworkTools(self.current_target)
                 results = net.subdomain_enum()
                 self.scan_results['subdomain'] = results
 
-            elif tool == 'dnszone':
-                net = NetworkTools(self.current_target)
-                net.zone_transfer()
-
-            # OSINT tools
+            # OSINT tools (web-focused only)
             elif tool == 'emailharvest':
                 osint = OSINTTools(self.current_target)
                 results = osint.email_harvest()
                 self.scan_results['emailharvest'] = results
-
-            elif tool == 'social':
-                osint = OSINTTools(self.current_target)
-                results = osint.social_links()
-                self.scan_results['social'] = results
 
             elif tool == 'metadata':
                 target_url = args[0] if args else self.current_target
@@ -797,7 +711,7 @@ class MenuSystem:
         # Build report
         report_lines = []
         report_lines.append("╔══════════════════════════════════════════════════════════════════╗")
-        report_lines.append("║              CYBERGUARDIAN ANALYTICS REPORT                      ║")
+        report_lines.append("║                 NPS TOOL ANALYTICS REPORT                        ║")
         report_lines.append("╚══════════════════════════════════════════════════════════════════╝")
         report_lines.append("")
         report_lines.append(f"Generated: {datetime.now().isoformat()}")
