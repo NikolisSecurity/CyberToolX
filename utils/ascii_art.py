@@ -1,9 +1,11 @@
-"""Enhanced ASCII art for CyberGuardian Ultimate"""
+"""Enhanced ASCII art for NPS Tool"""
 
 from .color_compat import colored
 import time
 import sys
 import random
+import requests
+import getpass
 
 
 class AsciiArt:
