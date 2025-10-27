@@ -121,7 +121,7 @@ class AsciiArt:
         sys.stdout.write('\033[2J\033[H')
         print(colored(frames[-1], 'green', attrs=['bold']))
         print(f"\n    [{colored('█' * 50, 'green')}] 100%")
-        print(f"\n    {colored('✓', 'green', attrs=['bold'])} System ready. All modules loaded successfully.")
+        print(f"\n    {colored('✓', 'green', attrs=['bold'])} System ready - Web security modules loaded.")
         time.sleep(1)
 
     @staticmethod
