@@ -132,34 +132,33 @@ class MenuSystem:
         return colored('[>] ', 'cyan', attrs=['bold'])
 
     def display_help(self, category=None):
-        """Display help information"""
+        """Display help information in new style"""
         self.clear_screen()
-        print(colored("\n╔═══════════════════════ COMMAND REFERENCE ═══════════════════════╗\n", 'cyan', attrs=['bold']))
+        print(colored("\n╒═══════════════════════════════════════════════════════════════════╕", 'cyan', attrs=['bold']))
+        print(colored("│                     AVAILABLE COMMANDS                            │", 'cyan', attrs=['bold']))
+        print(colored("╘═══════════════════════════════════════════════════════════════════╛\n", 'cyan', attrs=['bold']))
 
         categories = {
-            'Main': ['help', 'clear', 'exit', 'quit', 'banner', 'about'],
+            'Main Commands': ['help', 'clear', 'exit', 'quit', 'banner'],
             'Target Management': ['target', 'showtarget', 'cleartarget'],
-            'Reconnaissance': ['portscan', 'quickscan', 'deepscan', 'servicescan', 'vulnscan', 'nmap'],
-            'Network Analysis': ['ping', 'traceroute', 'dnsenum', 'dnszone', 'subdomain', 'whois', 'geoip', 'reverse', 'portsweep'],
-            'Web Testing': ['webscan', 'dirscan', 'sqlmap', 'xsstest', 'csrftest', 'headerscan', 'sslscan', 'wafscan', 'cmsscan', 'apiscan', 'graphql', 'jwtscan', 'robots'],
-            'Exploitation': ['exploitsearch', 'metasploit', 'shellgen', 'payloadgen', 'exploit'],
-            'Wireless': ['wifiscan', 'wificrack', 'bluetooth', 'rogue'],
-            'Password Tools': ['hashcrack', 'hashid', 'passgen', 'bruteforce', 'hydra'],
-            'Forensics & OSINT': ['emailharvest', 'metadata', 'social', 'phonelookup', 'iplookup', 'breach', 'peoplesearch'],
-            'Reporting': ['results', 'report', 'export', 'history', 'compare'],
-            'Configuration': ['settings', 'proxy', 'threads', 'timeout', 'verbose', 'update'],
-            'Analytics': ['stats', 'timeline', 'performance', 'exportstats'],
-            'Advanced': ['script', 'schedule', 'monitor', 'honeypot', 'custom']
+            'Web Vulnerability Testing': ['webscan', 'sqlmap', 'xsstest', 'csrftest', 'ssrf', 'lfi', 'rfi', 'xxe'],
+            'Web Reconnaissance': ['dirscan', 'headerscan', 'sslscan', 'wafscan', 'cmsscan', 'robots', 'cookies', 'cors'],
+            'API Testing': ['apiscan', 'graphql', 'jwtscan'],
+            'Other': ['redirect'],
+            'Reporting': ['results', 'report', 'export'],
+            'Analytics': ['stats', 'timeline', 'performance', 'exportstats']
         }
 
         for cat_name, cmd_list in categories.items():
-            print(colored(f"  {cat_name}:", 'yellow', attrs=['bold']))
+            print(colored(f"  [{cat_name}]", 'yellow', attrs=['bold']))
             for cmd in cmd_list:
                 desc = self.commands.get(cmd, 'No description')
-                print(f"    {colored(cmd, 'green'):<20} - {colored(desc, 'white')}")
+                print(f"    {colored(cmd, 'green'):<15} - {colored(desc, 'white')}")
             print()
 
-        print(colored("╚════════════════════════════════════════════════════════════════╝\n", 'cyan', attrs=['bold']))
+        print(colored("╒═══════════════════════════════════════════════════════════════════╕", 'cyan', attrs=['bold']))
+        print(colored("│ Type 'target <url>' to set target, then use any web testing tool │", 'cyan'))
+        print(colored("╘═══════════════════════════════════════════════════════════════════╛\n", 'cyan', attrs=['bold']))
 
     def display_about(self):
         """Display about information"""
