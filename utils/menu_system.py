@@ -297,43 +297,11 @@ class MenuSystem:
             return
 
         try:
-            # Import tools
-            from tools.recon_tools import ReconTools
+            # Import web tools only
             from tools.web_tools import WebTools
-            from tools.network_tools import NetworkTools
-            from tools.osint_tools import OSINTTools
 
-            # Reconnaissance tools
-            if tool == 'quickscan':
-                recon = ReconTools(self.current_target)
-                results = recon.quick_scan()
-                self.scan_results['quickscan'] = results
-
-            elif tool == 'deepscan':
-                recon = ReconTools(self.current_target)
-                results = recon.deep_scan()
-                self.scan_results['deepscan'] = results
-
-            elif tool == 'servicescan':
-                recon = ReconTools(self.current_target)
-                results = recon.service_scan()
-                self.scan_results['servicescan'] = results
-
-            elif tool == 'vulnscan':
-                recon = ReconTools(self.current_target)
-                results = recon.vuln_scan()
-                self.scan_results['vulnscan'] = results
-
-            elif tool == 'ping':
-                recon = ReconTools(self.current_target)
-                recon.ping_test()
-
-            elif tool == 'traceroute':
-                recon = ReconTools(self.current_target)
-                recon.traceroute()
-
-            # Web application tools
-            elif tool == 'headerscan':
+            # Web security tools
+            if tool == 'headerscan':
                 web = WebTools(self.current_target)
                 results = web.headers_scan()
                 self.scan_results['headerscan'] = results
@@ -357,55 +325,11 @@ class MenuSystem:
                 results = web.cms_detect()
                 self.scan_results['cmsscan'] = results
 
-            # Network tools
-            elif tool == 'dnsenum':
-                net = NetworkTools(self.current_target)
-                net.dns_enum()
-
-            elif tool == 'whois':
-                net = NetworkTools(self.current_target)
-                net.whois_lookup()
-
-            elif tool == 'reverse':
-                net = NetworkTools(self.current_target)
-                net.reverse_dns()
-
-            elif tool == 'subdomain':
-                net = NetworkTools(self.current_target)
-                results = net.subdomain_enum()
-                self.scan_results['subdomain'] = results
-
-            elif tool == 'dnszone':
-                net = NetworkTools(self.current_target)
-                net.zone_transfer()
-
-            # OSINT tools
-            elif tool == 'emailharvest':
-                osint = OSINTTools(self.current_target)
-                results = osint.email_harvest()
-                self.scan_results['emailharvest'] = results
-
-            elif tool == 'social':
-                osint = OSINTTools(self.current_target)
-                results = osint.social_links()
-                self.scan_results['social'] = results
-
-            elif tool == 'metadata':
-                target_url = args[0] if args else self.current_target
-                osint = OSINTTools(target_url)
-                results = osint.metadata_extract(target_url)
-                self.scan_results['metadata'] = results
-
-            elif tool == 'techstack':
-                osint = OSINTTools(self.current_target)
-                results = osint.tech_stack_detect()
-                self.scan_results['techstack'] = results
-
             # Results and reporting
             elif tool == 'results':
                 self.show_results()
 
-            # Tools not yet implemented
+            # All other web tools (not yet implemented)
             else:
                 print(f"\n{colored('⚡', 'yellow')} Tool: {colored(tool, 'green', attrs=['bold'])}")
                 AsciiArt.info_message(f"Tool '{tool}' integration coming soon!")
