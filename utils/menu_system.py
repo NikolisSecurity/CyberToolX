@@ -266,8 +266,17 @@ class MenuSystem:
         self.clear_screen()
 
         # Show main banner
-        print(AsciiArt.main_banner())
-        print(colored("  Type 'help' for available commands | Type 'exit' to quit\n", 'cyan'))
+        print(AsciiArt.main_banner(self.current_target))
+
+        # Welcome message with username
+        try:
+            username = getpass.getuser()
+        except Exception:
+            username = "User"
+
+        print(colored(f"Hello @{username}. Welcome to NPS Tool", 'cyan'))
+        print(colored("To view the list of commands, type help", 'cyan'))
+        print()
 
         while self.running:
             try:
