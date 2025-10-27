@@ -1,13 +1,13 @@
-# 🛡️ CyberGuardian Ultimate v2.0
+# 🌐 NPS Tool v1.0
 
-**Advanced Interactive Cybersecurity Warfare Platform**
+**Network Pentesting Suite - Web Security Edition**
 
-[![Version](https://img.shields.io/badge/version-2.0-blue.svg)](https://github.com/NikolisSecurity/CyberToolX)
+[![Version](https://img.shields.io/badge/version-1.0-blue.svg)](https://github.com/NikolisSecurity/CyberToolX)
 [![Python](https://img.shields.io/badge/python-3.8+-green.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-Authorized%20Use%20Only-red.svg)](LICENSE)
 [![Status](https://img.shields.io/badge/status-working-brightgreen.svg)](#)
 
-> *The ultimate command-line cybersecurity toolkit with interactive menu, auto-correction, and 25+ working security tools*
+> *Specialized web application security testing platform with 20+ web-focused security tools*
 
 ---
 
