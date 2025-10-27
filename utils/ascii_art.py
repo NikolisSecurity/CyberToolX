@@ -108,7 +108,7 @@ class AsciiArt:
             # Progress bar
             progress = int((i + 1) / 6 * 50)
             bar = '█' * progress + '░' * (50 - progress)
-            print(f"\n    [{colored(bar, color)}] {int((i + 1) / 8 * 100)}%")
+            print(f"\n    [{colored(bar, color)}] {int((i + 1) / 6 * 100)}%")
 
             # Loading message
             if i < len(loading_messages):
