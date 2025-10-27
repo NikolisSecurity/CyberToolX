@@ -341,41 +341,68 @@ class MenuSystem:
 
     def execute_command(self, command, args):
         """Execute a parsed command"""
-        # Main commands
-        if command == 'help':
-            self.display_help()
-        elif command == 'clear':
-            self.clear_screen()
-            print(AsciiArt.main_banner())
-        elif command in ['exit', 'quit']:
-            self.running = False
-            print(f"\n{colored('Shutting down CyberGuardian Ultimate...', 'cyan')}")
-            print(colored('Stay safe. Stay ethical. 👾\n', 'green'))
-        elif command == 'banner':
-            self.clear_screen()
-            print(AsciiArt.main_banner())
-        elif command == 'about':
-            self.display_about()
+        # START METRICS TRACKING
+        start_time = time.time()
+        status = "success"
+        error_msg = None
 
-        # Target management
-        elif command == 'target':
-            if args:
-                self.current_target = args[0]
-                AsciiArt.success_message(f"Target set to: {self.current_target}")
-            else:
-                AsciiArt.error_message("Usage: target <ip/domain>")
-        elif command == 'showtarget':
-            if self.current_target:
-                print(f"\n{colored('Current target:', 'cyan')} {colored(self.current_target, 'green', attrs=['bold'])}\n")
-            else:
-                AsciiArt.warning_message("No target set. Use 'target <ip/domain>' to set one.")
-        elif command == 'cleartarget':
-            self.current_target = None
-            AsciiArt.success_message("Target cleared")
+        try:
+            # Main commands
+            if command == 'help':
+                self.display_help()
+            elif command == 'clear':
+                self.clear_screen()
+                print(AsciiArt.main_banner())
+            elif command in ['exit', 'quit']:
+                self.running = False
+                print(f"\n{colored('Shutting down CyberGuardian Ultimate...', 'cyan')}")
+                print(colored('Stay safe. Stay ethical. 👾\n', 'green'))
+            elif command == 'banner':
+                self.clear_screen()
+                print(AsciiArt.main_banner())
+            elif command == 'about':
+                self.display_about()
 
-        # Tool execution - placeholder for now
-        else:
-            self.execute_tool(command, args)
+            # Target management
+            elif command == 'target':
+                if args:
+                    self.current_target = args[0]
+                    AsciiArt.success_message(f"Target set to: {self.current_target}")
+                else:
+                    AsciiArt.error_message("Usage: target <ip/domain>")
+            elif command == 'showtarget':
+                if self.current_target:
+                    print(f"\n{colored('Current target:', 'cyan')} {colored(self.current_target, 'green', attrs=['bold'])}\n")
+                else:
+                    AsciiArt.warning_message("No target set. Use 'target <ip/domain>' to set one.")
+            elif command == 'cleartarget':
+                self.current_target = None
+                AsciiArt.success_message("Target cleared")
+
+            # Analytics commands
+            elif command == 'stats':
+                self.display_stats()
+            elif command == 'timeline':
+                self.display_timeline()
+            elif command == 'performance':
+                self.display_performance()
+            elif command == 'exportstats':
+                self.export_stats()
+
+            # Tool execution - placeholder for now
+            else:
+                self.execute_tool(command, args)
+
+        except Exception as e:
+            status = "error"
+            error_msg = str(e)
+            # Re-raise the exception so normal error handling still works
+            raise
+
+        finally:
+            # ALWAYS log metrics, even if command failed
+            duration = time.time() - start_time
+            self._save_metric(command, duration, status, error_msg)
 
     def execute_tool(self, tool, args):
         """Execute a security tool"""
