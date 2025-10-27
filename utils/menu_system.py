@@ -289,9 +289,11 @@ class MenuSystem:
             self._save_metric(command, duration, status, error_msg)
 
     def execute_tool(self, tool, args):
-        """Execute a security tool"""
-        if not self.current_target and tool not in ['hashid', 'hashcrack', 'passgen', 'settings', 'update']:
-            AsciiArt.error_message("No target set. Use 'target <ip/domain>' first.")
+        """Execute a web security tool"""
+        # Check if target is required for this tool
+        tools_without_target = []
+        if not self.current_target and tool not in tools_without_target:
+            AsciiArt.error_message("No target set. Use 'target <url>' first.")
             return
 
         try:
