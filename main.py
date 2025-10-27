@@ -20,7 +20,7 @@ from utils.menu_system import MenuSystem
 
 
 def main():
-    """Launch CyberGuardian Ultimate interactive interface"""
+    """Launch NPS Tool interactive interface"""
     try:
         menu = MenuSystem()
         menu.run()
