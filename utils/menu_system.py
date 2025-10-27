@@ -368,48 +368,18 @@ class MenuSystem:
 
     def execute_tool(self, tool, args):
         """Execute a security tool"""
-        if not self.current_target and tool not in ['hashid', 'hashcrack', 'passgen', 'settings', 'update']:
+        if not self.current_target and tool not in ['settings', 'update']:
             AsciiArt.error_message("No target set. Use 'target <ip/domain>' first.")
             return
 
         try:
             # Import tools
-            from tools.recon_tools import ReconTools
             from tools.web_tools import WebTools
             from tools.network_tools import NetworkTools
             from tools.osint_tools import OSINTTools
 
-            # Reconnaissance tools
-            if tool == 'quickscan':
-                recon = ReconTools(self.current_target)
-                results = recon.quick_scan()
-                self.scan_results['quickscan'] = results
-
-            elif tool == 'deepscan':
-                recon = ReconTools(self.current_target)
-                results = recon.deep_scan()
-                self.scan_results['deepscan'] = results
-
-            elif tool == 'servicescan':
-                recon = ReconTools(self.current_target)
-                results = recon.service_scan()
-                self.scan_results['servicescan'] = results
-
-            elif tool == 'vulnscan':
-                recon = ReconTools(self.current_target)
-                results = recon.vuln_scan()
-                self.scan_results['vulnscan'] = results
-
-            elif tool == 'ping':
-                recon = ReconTools(self.current_target)
-                recon.ping_test()
-
-            elif tool == 'traceroute':
-                recon = ReconTools(self.current_target)
-                recon.traceroute()
-
             # Web application tools
-            elif tool == 'headerscan':
+            if tool == 'headerscan':
                 web = WebTools(self.current_target)
                 results = web.headers_scan()
                 self.scan_results['headerscan'] = results
@@ -433,38 +403,21 @@ class MenuSystem:
                 results = web.cms_detect()
                 self.scan_results['cmsscan'] = results
 
-            # Network tools
+            # Network tools (DNS/subdomain only)
             elif tool == 'dnsenum':
                 net = NetworkTools(self.current_target)
                 net.dns_enum()
-
-            elif tool == 'whois':
-                net = NetworkTools(self.current_target)
-                net.whois_lookup()
-
-            elif tool == 'reverse':
-                net = NetworkTools(self.current_target)
-                net.reverse_dns()
 
             elif tool == 'subdomain':
                 net = NetworkTools(self.current_target)
                 results = net.subdomain_enum()
                 self.scan_results['subdomain'] = results
 
-            elif tool == 'dnszone':
-                net = NetworkTools(self.current_target)
-                net.zone_transfer()
-
-            # OSINT tools
+            # OSINT tools (web-focused only)
             elif tool == 'emailharvest':
                 osint = OSINTTools(self.current_target)
                 results = osint.email_harvest()
                 self.scan_results['emailharvest'] = results
-
-            elif tool == 'social':
-                osint = OSINTTools(self.current_target)
-                results = osint.social_links()
-                self.scan_results['social'] = results
 
             elif tool == 'metadata':
                 target_url = args[0] if args else self.current_target
