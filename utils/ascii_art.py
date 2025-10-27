@@ -22,29 +22,33 @@ class AsciiArt:
 
     @staticmethod
     def main_banner(target=None):
-        """Main banner with cyberpunk style"""
-        banner = """
-╔═══════════════════════════════════════════════════════════════════════════════╗
-║                                                                               ║
-║   ██████╗██╗   ██╗██████╗ ███████╗██████╗  ██████╗ ██╗   ██╗ █████╗ ██████╗  ║
-║  ██╔════╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗██╔════╝ ██║   ██║██╔══██╗██╔══██╗ ║
-║  ██║      ╚████╔╝ ██████╔╝█████╗  ██████╔╝██║  ███╗██║   ██║███████║██████╔╝ ║
-║  ██║       ╚██╔╝  ██╔══██╗██╔══╝  ██╔══██╗██║   ██║██║   ██║██╔══██║██╔══██╗ ║
-║  ╚██████╗   ██║   ██████╔╝███████╗██║  ██║╚██████╔╝╚██████╔╝██║  ██║██║  ██║ ║
-║   ╚═════╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝ ║
-║                                                                               ║
-║                    ██╗   ██╗██╗  ████████╗██╗███╗   ███╗ █████╗ ████████╗███████╗║
-║                    ██║   ██║██║  ╚══██╔══╝██║████╗ ████║██╔══██╗╚══██╔══╝██╔════╝║
-║                    ██║   ██║██║     ██║   ██║██╔████╔██║███████║   ██║   █████╗  ║
-║                    ██║   ██║██║     ██║   ██║██║╚██╔╝██║██╔══██║   ██║   ██╔══╝  ║
-║                    ╚██████╔╝███████╗██║   ██║██║ ╚═╝ ██║██║  ██║   ██║   ███████╗║
-║                     ╚═════╝ ╚══════╝╚═╝   ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝   ╚═╝   ╚══════╝║
-║                                                                               ║
-║                     『 ULTIMATE CYBER WARFARE PLATFORM v2.0 』                 ║
-║                                                                               ║
-╚═══════════════════════════════════════════════════════════════════════════════╝
-"""
-        return colored(banner, 'cyan', attrs=['bold'])
+        """Main banner with compact box-drawing style"""
+        # Get target display
+        target_display = target if target else "Not Set"
+
+        # Fetch public IP
+        public_ip = AsciiArt.get_public_ip()
+
+        # Build account info box
+        account_box = f"""╒═════════════════════╕
+│ Account Information │
+│ Target: {target_display:<11} │
+│ IP: {public_ip:<15} │
+╘═════════════════════╛"""
+
+        # Horizontal separator
+        separator = "\n══╦═════════════════════════════════════╦══"
+
+        # Tool title box
+        title_box = """╔════════════════════════════════════════╗
+│  NPS Tool                              │
+│  Advanced Web Security Testing         │
+╚════════════════════════════════════════╝"""
+
+        # Combine all parts
+        banner = colored(account_box, 'cyan') + colored(separator, 'cyan') + "\n" + colored(title_box, 'cyan')
+
+        return banner
 
     @staticmethod
     def loading_screen():
