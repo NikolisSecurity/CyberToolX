@@ -674,7 +674,8 @@ class MenuSystem:
                 print(f"    {colored(date_str, 'cyan')}: {colored(f'{count} commands', 'white', attrs=['dark'])}")
 
         if today_hourly:
-            print(f"\n  {colored('Today\\'s Hourly Breakdown:', 'yellow', attrs=['bold'])}")
+            hourly_title = "Today's Hourly Breakdown:"
+            print(f"\n  {colored(hourly_title, 'yellow', attrs=['bold'])}")
             for hour in sorted(today_hourly.keys()):
                 count = today_hourly[hour]
                 hour_range = f"{hour:02d}:00-{hour:02d}:59"
