@@ -163,12 +163,12 @@ class MenuSystem:
     def get_system_info(self):
         """Get system information for display"""
         import socket
-        import requests
 
         pc_name = socket.gethostname()
 
         try:
-            # Get public IP
+            # Try to get public IP
+            import requests
             public_ip = requests.get('https://api.ipify.org', timeout=2).text
         except:
             public_ip = "Unknown"
