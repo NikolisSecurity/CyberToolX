@@ -711,7 +711,7 @@ class MenuSystem:
         # Build report
         report_lines = []
         report_lines.append("╔══════════════════════════════════════════════════════════════════╗")
-        report_lines.append("║              CYBERGUARDIAN ANALYTICS REPORT                      ║")
+        report_lines.append("║                 NPS TOOL ANALYTICS REPORT                        ║")
         report_lines.append("╚══════════════════════════════════════════════════════════════════╝")
         report_lines.append("")
         report_lines.append(f"Generated: {datetime.now().isoformat()}")
