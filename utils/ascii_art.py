@@ -89,14 +89,12 @@ class AsciiArt:
         ]
 
         loading_messages = [
-            "Initializing quantum encryption modules",
-            "Loading neural network exploit database",
-            "Calibrating packet injection systems",
-            "Establishing secure darknet connections",
-            "Compiling zero-day vulnerability signatures",
-            "Activating stealth reconnaissance protocols",
-            "Synchronizing with global threat intelligence",
-            "Deploying advanced penetration frameworks"
+            "Initializing web vulnerability scanners",
+            "Loading SSL/TLS analysis modules",
+            "Preparing SQL injection testers",
+            "Loading XSS detection engine",
+            "Initializing header security scanner",
+            "Loading WAF detection system"
         ]
 
         colors = ['red', 'yellow', 'green', 'cyan', 'magenta']
