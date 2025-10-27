@@ -136,6 +136,56 @@ class MenuSystem:
         """Clear terminal screen"""
         os.system('clear' if os.name != 'nt' else 'cls')
 
+    def _ensure_metrics_file(self):
+        """Initialize metrics file if it doesn't exist"""
+        try:
+            if not self.metrics_file.exists():
+                self.metrics_file.parent.mkdir(parents=True, exist_ok=True)
+                initial_data = {
+                    "metrics": [],
+                    "summary": {"total_commands": 0, "last_updated": None}
+                }
+                self.metrics_file.write_text(json.dumps(initial_data, indent=2))
+            else:
+                try:
+                    json.loads(self.metrics_file.read_text())
+                except json.JSONDecodeError:
+                    initial_data = {
+                        "metrics": [],
+                        "summary": {"total_commands": 0, "last_updated": None}
+                    }
+                    self.metrics_file.write_text(json.dumps(initial_data, indent=2))
+        except (OSError, PermissionError):
+            pass
+
+    def _load_metrics(self):
+        """Load metrics from JSON file"""
+        try:
+            if self.metrics_file.exists():
+                return json.loads(self.metrics_file.read_text())
+            return {"metrics": [], "summary": {"total_commands": 0, "last_updated": None}}
+        except (OSError, json.JSONDecodeError, PermissionError):
+            return {"metrics": [], "summary": {"total_commands": 0, "last_updated": None}}
+
+    def _save_metric(self, command, duration, status, error=None):
+        """Append a single metric entry"""
+        try:
+            data = self._load_metrics()
+            metric_entry = {
+                "command": command,
+                "timestamp": datetime.now().isoformat(),
+                "duration": round(duration, 3),
+                "status": status,
+                "target": self.current_target,
+                "error": error
+            }
+            data["metrics"].append(metric_entry)
+            data["summary"]["total_commands"] = len(data["metrics"])
+            data["summary"]["last_updated"] = metric_entry["timestamp"]
+            self.metrics_file.write_text(json.dumps(data, indent=2))
+        except (OSError, PermissionError):
+            pass
+
     def display_prompt(self):
         """Display beautiful command prompt"""
         if self.current_target:
