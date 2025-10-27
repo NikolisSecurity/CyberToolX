@@ -127,10 +127,26 @@
       "status": "success",
       "target": "test.local",
       "error": null
+    },
+    {
+      "command": "hel",
+      "timestamp": "2025-10-27T17:39:37.705835",
+      "duration": 0.0,
+      "status": "success",
+      "target": null,
+      "error": null
+    },
+    {
+      "command": "help",
+      "timestamp": "2025-10-27T17:39:37.708793",
+      "duration": 0.002,
+      "status": "success",
+      "target": null,
+      "error": null
     }
   ],
   "summary": {
-    "total_commands": 16,
-    "last_updated": "2025-10-27T17:12:20.232355"
+    "total_commands": 18,
+    "last_updated": "2025-10-27T17:39:37.708793"
   }
 }
