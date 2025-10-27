@@ -257,11 +257,10 @@ python3 main.py
 ### Auto-Correction
 
 ```bash
-cyber@guardian [target] > quckscan
+[>] hel
 
-Did you mean: quickscan?
-[y/n]: y
-✓ Using: quickscan
+Command "hel" is not valid.
+Did you mean: help?
 ```
 
 ### Beautiful Output
