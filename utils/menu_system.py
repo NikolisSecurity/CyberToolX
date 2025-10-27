@@ -19,6 +19,10 @@ class MenuSystem:
         self.current_target = None
         self.scan_results = {}
 
+        # Metrics tracking
+        self.metrics_file = Path(__file__).parent.parent / 'data' / 'command_metrics.json'
+        self._ensure_metrics_file()
+
         # Define all available commands
         self.commands = {
             # Main Menu
