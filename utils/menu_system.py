@@ -23,105 +23,46 @@ class MenuSystem:
         self.metrics_file = Path(__file__).parent.parent / 'data' / 'command_metrics.json'
         self._ensure_metrics_file()
 
-        # Define all available commands
+        # Define all available commands - WEB SECURITY ONLY
         self.commands = {
             # Main Menu
             'help': 'Display available commands and usage',
             'clear': 'Clear the screen',
-            'exit': 'Exit CyberGuardian Ultimate',
-            'quit': 'Exit CyberGuardian Ultimate',
+            'exit': 'Exit MCPTool',
+            'quit': 'Exit MCPTool',
             'banner': 'Display the main banner',
-            'about': 'About CyberGuardian Ultimate',
 
             # Target Management
-            'target': 'Set target for scanning (usage: target <ip/domain>)',
+            'target': 'Set target URL/domain (usage: target <url>)',
             'showtarget': 'Display current target',
             'cleartarget': 'Clear current target',
 
-            # Reconnaissance Tools
-            'portscan': 'Comprehensive port scanning',
-            'quickscan': 'Quick scan of common ports',
-            'deepscan': 'Deep scan of all 65535 ports',
-            'servicescan': 'Service version detection',
-            'vulnscan': 'Vulnerability scanning',
-            'nmap': 'Advanced nmap scanning with custom options',
-
-            # Network Analysis
-            'ping': 'ICMP ping test',
-            'traceroute': 'Trace route to target',
-            'dnsenum': 'DNS enumeration',
-            'dnszone': 'DNS zone transfer attempt',
-            'subdomain': 'Subdomain enumeration',
-            'whois': 'WHOIS lookup',
-            'geoip': 'Geolocation lookup',
-            'reverse': 'Reverse DNS lookup',
-            'portsweep': 'Sweep multiple hosts for open ports',
-
             # Web Application Testing
-            'webscan': 'Complete web application scan',
+            'webscan': 'Complete web application vulnerability scan',
             'dirscan': 'Directory and file enumeration',
-            'sqlmap': 'SQL injection testing',
-            'xsstest': 'XSS vulnerability testing',
+            'sqlmap': 'SQL injection vulnerability testing',
+            'xsstest': 'Cross-Site Scripting (XSS) testing',
             'csrftest': 'CSRF vulnerability testing',
-            'headerscan': 'Security headers analysis',
-            'sslscan': 'SSL/TLS configuration scan',
-            'wafscan': 'WAF detection and fingerprinting',
-            'cmsscan': 'CMS detection and version check',
-            'apiscan': 'API endpoint discovery',
-            'graphql': 'GraphQL introspection',
-            'jwtscan': 'JWT token analysis',
+            'headerscan': 'HTTP security headers analysis',
+            'sslscan': 'SSL/TLS configuration and certificate scan',
+            'wafscan': 'Web Application Firewall detection',
+            'cmsscan': 'CMS detection and version identification',
+            'apiscan': 'REST API endpoint discovery',
+            'graphql': 'GraphQL introspection and testing',
+            'jwtscan': 'JWT token security analysis',
             'robots': 'Check robots.txt and sitemap.xml',
-
-            # Exploitation
-            'exploitsearch': 'Search for exploits',
-            'metasploit': 'Metasploit integration',
-            'shellgen': 'Reverse shell generator',
-            'payloadgen': 'Payload generator',
-            'exploit': 'Execute exploit module',
-
-            # Wireless Security
-            'wifiscan': 'Scan for wireless networks',
-            'wificrack': 'Wireless password cracking',
-            'bluetooth': 'Bluetooth device scanning',
-            'rogue': 'Rogue AP detection',
-
-            # Password & Hash Tools
-            'hashcrack': 'Crack password hashes',
-            'hashid': 'Identify hash type',
-            'passgen': 'Generate password wordlist',
-            'bruteforce': 'Brute force attack',
-            'hydra': 'Network service bruteforce (Hydra)',
-
-            # Forensics & OSINT
-            'emailharvest': 'Email address harvesting',
-            'metadata': 'Extract file metadata',
-            'social': 'Social media OSINT',
-            'phonelookup': 'Phone number lookup',
-            'iplookup': 'IP address intelligence',
-            'breach': 'Check if email/password in breach',
-            'peoplesearch': 'People search OSINT',
+            'cookies': 'Cookie security analysis',
+            'cors': 'CORS misconfiguration testing',
+            'redirect': 'Open redirect vulnerability testing',
+            'ssrf': 'Server-Side Request Forgery testing',
+            'lfi': 'Local File Inclusion testing',
+            'rfi': 'Remote File Inclusion testing',
+            'xxe': 'XML External Entity testing',
 
             # Reporting & Results
             'results': 'Show scan results',
             'report': 'Generate comprehensive report',
             'export': 'Export results to file',
-            'history': 'View scan history',
-            'compare': 'Compare multiple scan results',
-
-            # Configuration
-            'settings': 'View/modify settings',
-            'proxy': 'Configure proxy settings',
-            'threads': 'Set thread count',
-            'timeout': 'Set connection timeout',
-            'verbose': 'Toggle verbose output',
-            'update': 'Update tool databases',
-
-            # Advanced
-            'script': 'Run automation script',
-            'schedule': 'Schedule recurring scans',
-            'monitor': 'Continuous monitoring mode',
-            'honeypot': 'Deploy honeypot',
-            'custom': 'Execute custom command',
 
             # Analytics & Metrics
             'stats': 'Display command usage statistics',
