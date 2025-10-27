@@ -300,30 +300,90 @@ class MenuSystem:
             # Import web tools only
             from tools.web_tools import WebTools
 
-            # Web security tools
-            if tool == 'headerscan':
-                web = WebTools(self.current_target)
+            web = WebTools(self.current_target)
+
+            # Comprehensive scans
+            if tool == 'webscan':
+                results = web.webscan()
+                self.scan_results['webscan'] = results
+
+            # Web reconnaissance
+            elif tool == 'dirscan':
+                results = web.dir_scan()
+                self.scan_results['dirscan'] = results
+
+            elif tool == 'headerscan':
                 results = web.headers_scan()
                 self.scan_results['headerscan'] = results
 
             elif tool == 'sslscan':
-                web = WebTools(self.current_target)
                 results = web.ssl_scan()
                 self.scan_results['sslscan'] = results
 
             elif tool == 'robots':
-                web = WebTools(self.current_target)
                 web.robots_check()
 
             elif tool == 'wafscan':
-                web = WebTools(self.current_target)
                 results = web.waf_detect()
                 self.scan_results['wafscan'] = results
 
             elif tool == 'cmsscan':
-                web = WebTools(self.current_target)
                 results = web.cms_detect()
                 self.scan_results['cmsscan'] = results
+
+            elif tool == 'cookies':
+                results = web.cookie_scan()
+                self.scan_results['cookies'] = results
+
+            elif tool == 'cors':
+                results = web.cors_test()
+                self.scan_results['cors'] = results
+
+            # Vulnerability testing
+            elif tool == 'sqlmap':
+                results = web.sql_injection_test()
+                self.scan_results['sqlmap'] = results
+
+            elif tool == 'xsstest':
+                results = web.xss_test()
+                self.scan_results['xsstest'] = results
+
+            elif tool == 'csrftest':
+                results = web.csrf_test()
+                self.scan_results['csrftest'] = results
+
+            elif tool == 'redirect':
+                results = web.open_redirect_test()
+                self.scan_results['redirect'] = results
+
+            elif tool == 'ssrf':
+                results = web.ssrf_test()
+                self.scan_results['ssrf'] = results
+
+            elif tool == 'lfi':
+                results = web.lfi_test()
+                self.scan_results['lfi'] = results
+
+            elif tool == 'rfi':
+                results = web.rfi_test()
+                self.scan_results['rfi'] = results
+
+            elif tool == 'xxe':
+                results = web.xxe_test()
+                self.scan_results['xxe'] = results
+
+            # API testing
+            elif tool == 'apiscan':
+                results = web.api_scan()
+                self.scan_results['apiscan'] = results
+
+            elif tool == 'graphql':
+                results = web.graphql_test()
+                self.scan_results['graphql'] = results
+
+            elif tool == 'jwtscan':
+                results = web.jwt_scan()
+                self.scan_results['jwtscan'] = results
 
             # Results and reporting
             elif tool == 'results':
