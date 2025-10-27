@@ -53,63 +53,6 @@ class NetworkTools:
             AsciiArt.error_message(f"DNS enumeration failed: {str(e)}")
             return None
 
-    def whois_lookup(self):
-        """WHOIS information lookup"""
-        print(f"\n{colored('WHOIS Lookup...', 'cyan')}")
-
-        try:
-            result = subprocess.run(['whois', self.target],
-                                  capture_output=True, text=True, timeout=30)
-
-            if result.returncode == 0:
-                print(result.stdout)
-                AsciiArt.success_message("WHOIS lookup completed")
-                return result.stdout
-            else:
-                AsciiArt.error_message("WHOIS lookup failed")
-                return None
-
-        except subprocess.TimeoutExpired:
-            AsciiArt.error_message("WHOIS timeout")
-            return None
-        except FileNotFoundError:
-            AsciiArt.error_message("whois command not found. Install with: sudo apt install whois")
-            return None
-        except Exception as e:
-            AsciiArt.error_message(f"WHOIS failed: {str(e)}")
-            return None
-
-    def reverse_dns(self):
-        """Reverse DNS lookup"""
-        print(f"\n{colored('Reverse DNS Lookup...', 'cyan')}")
-
-        try:
-            # First resolve to IP if needed
-            try:
-                ip = socket.gethostbyname(self.target)
-            except:
-                ip = self.target
-
-            # Reverse lookup
-            hostname, aliases, addresses = socket.gethostbyaddr(ip)
-
-            print(f"\n{colored('IP:', 'yellow')} {ip}")
-            print(f"{colored('Hostname:', 'yellow')} {hostname}")
-
-            if aliases:
-                print(f"{colored('Aliases:', 'yellow')}")
-                for alias in aliases:
-                    print(f"  {alias}")
-
-            AsciiArt.success_message("Reverse DNS lookup completed")
-            return {'ip': ip, 'hostname': hostname, 'aliases': aliases}
-
-        except socket.herror:
-            AsciiArt.warning_message("No reverse DNS entry found")
-            return None
-        except Exception as e:
-            AsciiArt.error_message(f"Reverse DNS failed: {str(e)}")
-            return None
 
     def subdomain_enum(self):
         """Subdomain enumeration"""
