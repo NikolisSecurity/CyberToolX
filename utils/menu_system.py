@@ -679,8 +679,11 @@ class MenuSystem:
         if error_prone:
             print(f"\n  {colored('Error-Prone Commands:', 'yellow', attrs=['bold'])}")
             for cmd, stats in error_prone:
-                color = 'red' if stats["error_rate"] > 20 else 'yellow' if stats["error_rate"] > 10 else 'white'
-                print(f"    {colored(cmd, color)}: {colored(f'{stats[\"error_rate\"]:.1f}% failures', color)} ({stats['errors']}/{stats['total']})")
+                error_rate = stats["error_rate"]
+                errors = stats["errors"]
+                total = stats["total"]
+                color = 'red' if error_rate > 20 else 'yellow' if error_rate > 10 else 'white'
+                print(f"    {colored(cmd, color)}: {colored(f'{error_rate:.1f}% failures', color)} ({errors}/{total})")
         else:
             print(f"\n  {colored('Error-Prone Commands:', 'yellow', attrs=['bold'])}")
             print(f"    {colored('No failed commands - perfect record!', 'green')}")
