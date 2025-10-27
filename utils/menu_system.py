@@ -515,3 +515,265 @@ class MenuSystem:
 
         print(colored("╚════════════════════════════════════════════════════════════╝\n", 'green', attrs=['bold']))
         print(f"{colored('💾 Tip:', 'cyan')} Use {colored('report', 'green', attrs=['bold'])} to generate a full report\n")
+
+    def display_stats(self):
+        """Show usage statistics"""
+        self.clear_screen()
+        data = self._load_metrics()
+        metrics = data.get("metrics", [])
+
+        if not metrics:
+            print(colored("\n╔═══════════════════ COMMAND USAGE STATISTICS ════════════════════╗\n", 'cyan', attrs=['bold']))
+            print(f"  {colored('No command history yet. Start using commands to see statistics!', 'yellow')}\n")
+            print(colored("╚══════════════════════════════════════════════════════════════════╝\n", 'cyan', attrs=['bold']))
+            return
+
+        from datetime import timedelta
+        total_commands = len(metrics)
+        success_count = sum(1 for m in metrics if m.get("status") == "success")
+        failed_count = total_commands - success_count
+        success_rate = (success_count / total_commands * 100) if total_commands > 0 else 0
+
+        command_counts = {}
+        for m in metrics:
+            cmd = m.get("command", "unknown")
+            command_counts[cmd] = command_counts.get(cmd, 0) + 1
+        most_used = sorted(command_counts.items(), key=lambda x: x[1], reverse=True)[:10]
+
+        now = datetime.now()
+        recent_count = sum(1 for m in metrics if (now - datetime.fromisoformat(m.get("timestamp", "1970-01-01"))) < timedelta(hours=24))
+
+        target_counts = {}
+        for m in metrics:
+            target = m.get("target")
+            if target:
+                target_counts[target] = target_counts.get(target, 0) + 1
+        active_targets = sorted(target_counts.items(), key=lambda x: x[1], reverse=True)[:5]
+
+        print(colored("\n╔═══════════════════ COMMAND USAGE STATISTICS ════════════════════╗\n", 'cyan', attrs=['bold']))
+        print(f"  {colored('Total Commands Executed:', 'yellow')} {colored(str(total_commands), 'green')}")
+        rate_color = 'green' if success_rate > 80 else 'yellow' if success_rate >= 50 else 'red'
+        print(f"  {colored('Success Rate:', 'yellow')} {colored(f'{success_rate:.1f}%', rate_color)}")
+        print(f"  {colored('Failed Commands:', 'yellow')} {colored(str(failed_count), 'red')}")
+        print(f"  {colored('Commands in Last 24h:', 'yellow')} {colored(str(recent_count), 'green')}")
+        print(f"\n  {colored('Most Used Commands:', 'yellow')}")
+        for i, (cmd, count) in enumerate(most_used, 1):
+            print(f"    {colored(f'{i}.', 'cyan')} {colored(cmd, 'green')} ({count} times)")
+        if active_targets:
+            print(f"\n  {colored('Active Targets:', 'yellow')}")
+            for target, count in active_targets:
+                print(f"    {colored(target, 'cyan')} ({count} commands)")
+        print(colored("\n╚══════════════════════════════════════════════════════════════════╝", 'cyan', attrs=['bold']))
+        print(f"{colored('💡 Tip:', 'cyan')} Use {colored('timeline', 'green', attrs=['bold'])} and {colored('performance', 'green', attrs=['bold'])} for more details\n")
+
+    def display_timeline(self):
+        """Show command usage over time"""
+        self.clear_screen()
+        data = self._load_metrics()
+        metrics = data.get("metrics", [])
+
+        if not metrics:
+            print(colored("\n╔═══════════════════ COMMAND USAGE TIMELINE ══════════════════════╗\n", 'cyan', attrs=['bold']))
+            print(f"  {colored('No command history available', 'yellow')}\n")
+            print(colored("╚══════════════════════════════════════════════════════════════════╝\n", 'cyan', attrs=['bold']))
+            return
+
+        from datetime import timedelta
+        date_counts = {}
+        today_hourly = {}
+        now = datetime.now()
+        today_date = now.date()
+
+        for m in metrics:
+            try:
+                timestamp = datetime.fromisoformat(m.get("timestamp", ""))
+                date = timestamp.date()
+                date_counts[date] = date_counts.get(date, 0) + 1
+                if date == today_date:
+                    hour = timestamp.hour
+                    today_hourly[hour] = today_hourly.get(hour, 0) + 1
+            except:
+                pass
+
+        last_7_days = [(now - timedelta(days=i)).date() for i in range(6, -1, -1)]
+
+        print(colored("\n╔═══════════════════ COMMAND USAGE TIMELINE ══════════════════════╗\n", 'cyan', attrs=['bold']))
+        print(f"  {colored('Last 7 Days:', 'yellow', attrs=['bold'])}")
+        for date in last_7_days:
+            count = date_counts.get(date, 0)
+            date_str = date.strftime('%Y-%m-%d')
+            if count > 0:
+                print(f"    {colored(date_str, 'cyan')}: {colored(f'{count} commands', 'green')}")
+            else:
+                print(f"    {colored(date_str, 'cyan')}: {colored(f'{count} commands', 'white', attrs=['dark'])}")
+
+        if today_hourly:
+            print(f"\n  {colored('Today\\'s Hourly Breakdown:', 'yellow', attrs=['bold'])}")
+            for hour in sorted(today_hourly.keys()):
+                count = today_hourly[hour]
+                hour_range = f"{hour:02d}:00-{hour:02d}:59"
+                print(f"    {colored(hour_range, 'yellow')}: {colored(f'{count} commands', 'green')}")
+
+        print(colored("\n╚══════════════════════════════════════════════════════════════════╝\n", 'cyan', attrs=['bold']))
+
+    def display_performance(self):
+        """Show command performance metrics"""
+        self.clear_screen()
+        data = self._load_metrics()
+        metrics = data.get("metrics", [])
+
+        if not metrics:
+            print(colored("\n╔═══════════════════ COMMAND PERFORMANCE METRICS ═════════════════╗\n", 'cyan', attrs=['bold']))
+            print(f"  {colored('No performance data available', 'yellow')}\n")
+            print(colored("╚══════════════════════════════════════════════════════════════════╝\n", 'cyan', attrs=['bold']))
+            return
+
+        command_stats = {}
+        for m in metrics:
+            cmd = m.get("command", "unknown")
+            duration = m.get("duration", 0)
+            status = m.get("status", "unknown")
+            if cmd not in command_stats:
+                command_stats[cmd] = {"durations": [], "errors": 0, "total": 0}
+            command_stats[cmd]["durations"].append(duration)
+            command_stats[cmd]["total"] += 1
+            if status == "error":
+                command_stats[cmd]["errors"] += 1
+
+        for cmd, stats in command_stats.items():
+            stats["max"] = max(stats["durations"])
+            stats["avg"] = sum(stats["durations"]) / len(stats["durations"])
+            stats["error_rate"] = (stats["errors"] / stats["total"] * 100) if stats["total"] > 0 else 0
+
+        slowest = sorted(command_stats.items(), key=lambda x: x[1]["max"], reverse=True)[:10]
+        avg_slow = [(cmd, stats) for cmd, stats in command_stats.items() if stats["avg"] > 1.0]
+        avg_slow.sort(key=lambda x: x[1]["avg"], reverse=True)
+        fastest = [(cmd, stats) for cmd, stats in command_stats.items() if stats["avg"] < 0.1]
+        fastest.sort(key=lambda x: x[1]["avg"])[:10]
+        error_prone = [(cmd, stats) for cmd, stats in command_stats.items() if stats["error_rate"] > 0]
+        error_prone.sort(key=lambda x: x[1]["error_rate"], reverse=True)[:10]
+
+        print(colored("\n╔═══════════════════ COMMAND PERFORMANCE METRICS ═════════════════╗\n", 'cyan', attrs=['bold']))
+
+        if slowest:
+            print(f"  {colored('Slowest Commands (Maximum Duration):', 'yellow', attrs=['bold'])}")
+            for cmd, stats in slowest:
+                duration = stats["max"]
+                color = 'red' if duration > 10 else 'yellow' if duration >= 1 else 'white'
+                print(f"    {colored(cmd, color)}: {colored(f'{duration:.3f}s', color)}")
+
+        if avg_slow:
+            print(f"\n  {colored('Average Execution Times (>1s):', 'yellow', attrs=['bold'])}")
+            for cmd, stats in avg_slow:
+                print(f"    {colored(cmd, 'yellow')}: {colored(f'{stats[\"avg\"]:.3f}s avg', 'white')} ({stats['total']} runs)")
+
+        if fastest:
+            print(f"\n  {colored('Fastest Commands:', 'yellow', attrs=['bold'])}")
+            for cmd, stats in fastest[:10]:
+                print(f"    {colored(cmd, 'green')}: {colored(f'{stats[\"avg\"]:.3f}s', 'green')}")
+
+        if error_prone:
+            print(f"\n  {colored('Error-Prone Commands:', 'yellow', attrs=['bold'])}")
+            for cmd, stats in error_prone:
+                color = 'red' if stats["error_rate"] > 20 else 'yellow' if stats["error_rate"] > 10 else 'white'
+                print(f"    {colored(cmd, color)}: {colored(f'{stats[\"error_rate\"]:.1f}% failures', color)} ({stats['errors']}/{stats['total']})")
+        else:
+            print(f"\n  {colored('Error-Prone Commands:', 'yellow', attrs=['bold'])}")
+            print(f"    {colored('No failed commands - perfect record!', 'green')}")
+
+        print(colored("\n╚══════════════════════════════════════════════════════════════════╝\n", 'cyan', attrs=['bold']))
+
+    def export_stats(self):
+        """Export analytics to a report file"""
+        data = self._load_metrics()
+        metrics = data.get("metrics", [])
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        output_file = self.metrics_file.parent / f'analytics_report_{timestamp}.txt'
+
+        report_lines = []
+        report_lines.append("╔══════════════════════════════════════════════════════════════════╗")
+        report_lines.append("║              CYBERGUARDIAN ANALYTICS REPORT                      ║")
+        report_lines.append("╚══════════════════════════════════════════════════════════════════╝")
+        report_lines.append("")
+        report_lines.append(f"Generated: {datetime.now().isoformat()}")
+        report_lines.append("")
+
+        if not metrics:
+            report_lines.append("=== NO DATA AVAILABLE ===")
+            report_lines.append("No command history found. Start using commands to generate analytics.")
+        else:
+            total_commands = len(metrics)
+            success_count = sum(1 for m in metrics if m.get("status") == "success")
+            success_rate = (success_count / total_commands * 100) if total_commands > 0 else 0
+
+            report_lines.append("=== USAGE STATISTICS ===")
+            report_lines.append(f"Total Commands Executed: {total_commands}")
+            report_lines.append(f"Success Rate: {success_rate:.1f}%")
+            report_lines.append(f"Failed Commands: {total_commands - success_count}")
+            report_lines.append("")
+
+            command_counts = {}
+            for m in metrics:
+                cmd = m.get("command", "unknown")
+                command_counts[cmd] = command_counts.get(cmd, 0) + 1
+            most_used = sorted(command_counts.items(), key=lambda x: x[1], reverse=True)[:20]
+
+            report_lines.append("=== TOP COMMANDS ===")
+            for i, (cmd, count) in enumerate(most_used, 1):
+                report_lines.append(f"{i}. {cmd}: {count} times")
+            report_lines.append("")
+
+            command_stats = {}
+            for m in metrics:
+                cmd = m.get("command", "unknown")
+                duration = m.get("duration", 0)
+                if cmd not in command_stats:
+                    command_stats[cmd] = []
+                command_stats[cmd].append(duration)
+
+            report_lines.append("=== PERFORMANCE METRICS ===")
+            for cmd in sorted(command_stats.keys()):
+                durations = command_stats[cmd]
+                avg_dur = sum(durations) / len(durations)
+                max_dur = max(durations)
+                report_lines.append(f"{cmd}: avg={avg_dur:.3f}s, max={max_dur:.3f}s, runs={len(durations)}")
+            report_lines.append("")
+
+            from datetime import timedelta
+            date_counts = {}
+            now = datetime.now()
+            for m in metrics:
+                try:
+                    timestamp = datetime.fromisoformat(m.get("timestamp", ""))
+                    date = timestamp.date()
+                    date_counts[date] = date_counts.get(date, 0) + 1
+                except:
+                    pass
+
+            last_30_days = [(now - timedelta(days=i)).date() for i in range(29, -1, -1)]
+            report_lines.append("=== TIMELINE (Last 30 Days) ===")
+            for date in last_30_days:
+                count = date_counts.get(date, 0)
+                if count > 0:
+                    report_lines.append(f"{date.strftime('%Y-%m-%d')}: {count} commands")
+            report_lines.append("")
+
+            report_lines.append("=== FULL METRICS LOG ===")
+            for m in metrics:
+                timestamp = m.get("timestamp", "unknown")
+                command = m.get("command", "unknown")
+                duration = m.get("duration", 0)
+                status = m.get("status", "unknown")
+                target = m.get("target", "none")
+                error = m.get("error")
+                error_str = f", error={error}" if error else ""
+                report_lines.append(f"[{timestamp}] {command}: duration={duration:.3f}s, status={status}, target={target}{error_str}")
+
+        try:
+            report_content = "\n".join(report_lines)
+            output_file.write_text(report_content)
+            AsciiArt.success_message(f"Analytics report exported to: {output_file}")
+            return str(output_file)
+        except (OSError, PermissionError) as e:
+            AsciiArt.error_message(f"Failed to export report: {str(e)}")
+            return None
