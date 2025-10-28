@@ -512,6 +512,14 @@ class MenuSystem:
             # Results and reporting
             elif tool == 'results':
                 self.show_results()
+            elif tool == 'report':
+                self.generate_report()
+            elif tool == 'export':
+                self.export_results(args)
+            elif tool == 'history':
+                self.show_history()
+            elif tool == 'compare':
+                self.compare_results(args)
 
             # Tools not yet implemented
             else:
