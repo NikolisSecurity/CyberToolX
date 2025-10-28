@@ -368,6 +368,26 @@ class MenuSystem:
             elif command == 'exportstats':
                 self.export_stats()
 
+            # Configuration commands
+            elif command == 'settings':
+                self.show_settings()
+            elif command == 'proxy':
+                self.set_proxy(args)
+            elif command == 'threads':
+                if args:
+                    self.set_threads(args)
+                else:
+                    AsciiArt.error_message("Usage: threads <count>")
+            elif command == 'timeout':
+                if args:
+                    self.set_timeout(args)
+                else:
+                    AsciiArt.error_message("Usage: timeout <seconds>")
+            elif command == 'verbose':
+                self.toggle_verbose()
+            elif command == 'update':
+                self.update_databases()
+
             # Tool execution - placeholder for now
             else:
                 self.execute_tool(command, args)
