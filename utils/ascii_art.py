@@ -171,38 +171,38 @@ class AsciiArt:
 
     @staticmethod
     def tool_category_banner(category):
-        """Generate banner for tool categories"""
+        """Generate banner for tool categories with neon red theme"""
         banners = {
             'recon': colored("""
     ╔══════════════════════════════════════╗
     ║   🔍 RECONNAISSANCE & ENUMERATION    ║
     ╚══════════════════════════════════════╝
-            """, 'cyan'),
+            """, 'magenta'),  # Lighter pink-red
             'exploit': colored("""
     ╔══════════════════════════════════════╗
     ║   💣 EXPLOITATION & WEAPONIZATION    ║
     ╚══════════════════════════════════════╝
-            """, 'red'),
+            """, 'red'),  # Neon red
             'web': colored("""
     ╔══════════════════════════════════════╗
     ║   🌐 WEB APPLICATION TESTING         ║
     ╚══════════════════════════════════════╝
-            """, 'yellow'),
+            """, 'red'),  # Neon red
             'wireless': colored("""
     ╔══════════════════════════════════════╗
     ║   📡 WIRELESS SECURITY ASSESSMENT    ║
     ╚══════════════════════════════════════╝
-            """, 'magenta'),
+            """, 'magenta'),  # Lighter pink-red
             'password': colored("""
     ╔══════════════════════════════════════╗
     ║   🔐 PASSWORD & HASH CRACKING        ║
     ╚══════════════════════════════════════╝
-            """, 'blue'),
+            """, 'red'),  # Neon red
             'forensics': colored("""
     ╔══════════════════════════════════════╗
     ║   🔬 DIGITAL FORENSICS & OSINT       ║
     ╚══════════════════════════════════════╝
-            """, 'green')
+            """, 'magenta')  # Lighter pink-red
         }
         return banners.get(category, "")
 
@@ -224,4 +224,4 @@ class AsciiArt:
     @staticmethod
     def info_message(text):
         """Beautiful info message"""
-        print(f"\n{colored('ℹ', 'cyan', attrs=['bold'])} {colored(text, 'cyan')}\n")
+        print(f"\n{colored('ℹ', 'blue', attrs=['bold'])} {colored(text, 'blue')}\n")  # Lighter pink-red
