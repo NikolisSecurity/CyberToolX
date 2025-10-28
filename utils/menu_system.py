@@ -1062,3 +1062,89 @@ class MenuSystem:
 
         print(colored("╚══════════════════════════════════════════════════════════════════╝\n", 'red', attrs=['bold']))
         print(f"{colored('💡 Tip:', 'blue')} Wordlists saved to data/ directory\n")
+
+    # REPORTING COMMANDS
+    def generate_report(self):
+        """Generate comprehensive HTML report from scan results"""
+        if not self.scan_results:
+            AsciiArt.error_message("No scan results to report. Run some scans first!")
+            return
+
+        print(colored("\n╔═══════════════════════ GENERATING REPORT ════════════════════════╗\n", 'red', attrs=['bold']))
+
+        from pathlib import Path
+        from datetime import datetime
+        import json
+
+        # Create reports directory  
+        reports_dir = Path(__file__).parent.parent / 'reports'
+        reports_dir.mkdir(exist_ok=True)
+
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        report_file = reports_dir / f'report_{timestamp}.html'
+
+        print(f"{colored('Collecting scan results...', 'yellow')}")
+        for scan_type, results in self.scan_results.items():
+            if results:
+                count = len(results) if isinstance(results, (list, dict)) else 1
+                print(f"{colored('✓', 'green')} {scan_type}: {count} findings")
+
+        # Build HTML
+        html = f"""<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>NPS Tool Report</title>
+<style>body{{background:#000;color:#ff3377;font-family:monospace;padding:30px}}
+h1{{color:#ff0055;border:2px solid #ff0055;padding:15px;text-align:center}}
+pre{{background:#0a0a0a;border:1px solid #ff0055;padding:10px;color:#ff3377}}</style>
+</head><body><h1>NPS Tool Security Report</h1>
+<p><b>Target:</b> {self.current_target}</p><p><b>Date:</b> {datetime.now()}</p>"""
+
+        for scan_type, results in self.scan_results.items():
+            html += f"<h2>{scan_type.upper()}</h2><pre>{json.dumps(results, indent=2, default=str)}</pre>"
+
+        html += "</body></html>"
+        report_file.write_text(html)
+
+        print(colored("╚══════════════════════════════════════════════════════════════════╝\n", 'red', attrs=['bold']))
+        AsciiArt.success_message(f"Report created: {report_file}")
+        return str(report_file)
+
+    def export_results(self, args):
+        """Export scan results to file"""
+        if not self.scan_results:
+            AsciiArt.error_message("No scan results to export.")
+            return
+
+        from pathlib import Path
+        from datetime import datetime
+        import json
+
+        format_type = args[0].lower() if args else 'json'
+        exports_dir = Path(__file__).parent.parent / 'exports'
+        exports_dir.mkdir(exist_ok=True)
+
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        export_file = exports_dir / f'scan_export_{timestamp}.{format_type}'
+
+        with open(export_file, 'w') as f:
+            json.dump({'target': self.current_target, 'results': self.scan_results}, f, indent=2, default=str)
+
+        AsciiArt.success_message(f"Exported to: {export_file}")
+
+    def show_history(self):
+        """View scan history"""
+        print(colored("\n╔═══════════════════════ SCAN HISTORY ═════════════════════════════╗\n", 'red', attrs=['bold']))
+        if not self.scan_history:
+            print(f"{colored('No scan history yet.', 'white')}\n")
+        else:
+            for i, entry in enumerate(self.scan_history[-10:][::-1], 1):
+                print(f"{i}. {entry}")
+        print(colored("╚══════════════════════════════════════════════════════════════════╝\n", 'red', attrs=['bold']))
+
+    def compare_results(self, args):
+        """Compare scan results"""
+        print(colored("\n╔═══════════════════════ SCAN COMPARISON ══════════════════════════╗\n", 'red', attrs=['bold']))
+        print(f"{colored('Comparison: Current results', 'yellow')}\n")
+        if self.scan_results:
+            for scan_type in self.scan_results.keys():
+                print(f"  • {scan_type}")
+        print(colored("\n╚══════════════════════════════════════════════════════════════════╝\n", 'red', attrs=['bold']))
