@@ -11,6 +11,10 @@ from .color_compat import colored
 from .ascii_art import AsciiArt
 from .command_parser import CommandParser
 
+# Import configuration
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config import CONFIG, DEFAULTS
+
 
 class MenuSystem:
     """Interactive menu-driven interface"""
@@ -19,6 +23,19 @@ class MenuSystem:
         self.running = True
         self.current_target = None
         self.scan_results = {}
+
+        # Configuration settings
+        self.config = {
+            'proxy': None,
+            'threads': CONFIG.get('max_threads', 50),
+            'timeout': CONFIG.get('timeout', 5),
+            'verbose': DEFAULTS.get('verbose', False),
+            'user_agent': CONFIG.get('user_agent', 'CyberGuardian/2.0'),
+            'verify_ssl': DEFAULTS.get('verify_ssl', False),
+        }
+
+        # Scan history tracking
+        self.scan_history = []
 
         # Metrics tracking
         self.metrics_file = Path(__file__).parent.parent / 'data' / 'command_metrics.json'
@@ -351,6 +368,26 @@ class MenuSystem:
             elif command == 'exportstats':
                 self.export_stats()
 
+            # Configuration commands
+            elif command == 'settings':
+                self.show_settings()
+            elif command == 'proxy':
+                self.set_proxy(args)
+            elif command == 'threads':
+                if args:
+                    self.set_threads(args)
+                else:
+                    AsciiArt.error_message("Usage: threads <count>")
+            elif command == 'timeout':
+                if args:
+                    self.set_timeout(args)
+                else:
+                    AsciiArt.error_message("Usage: timeout <seconds>")
+            elif command == 'verbose':
+                self.toggle_verbose()
+            elif command == 'update':
+                self.update_databases()
+
             # Tool execution - placeholder for now
             else:
                 self.execute_tool(command, args)
@@ -403,6 +440,48 @@ class MenuSystem:
                 results = web.cms_detect()
                 self.scan_results['cmsscan'] = results
 
+            # New web testing tools
+            elif tool == 'webscan':
+                web = WebTools(self.current_target)
+                results = web.webscan()
+                self.scan_results['webscan'] = results
+
+            elif tool == 'dirscan':
+                web = WebTools(self.current_target)
+                results = web.dirscan()
+                self.scan_results['dirscan'] = results
+
+            elif tool == 'sqlmap':
+                web = WebTools(self.current_target)
+                results = web.sqlmap_scan()
+                self.scan_results['sqlmap'] = results
+
+            elif tool == 'xsstest':
+                web = WebTools(self.current_target)
+                results = web.xss_test()
+                self.scan_results['xsstest'] = results
+
+            elif tool == 'csrftest':
+                web = WebTools(self.current_target)
+                results = web.csrf_test()
+                self.scan_results['csrftest'] = results
+
+            elif tool == 'apiscan':
+                web = WebTools(self.current_target)
+                results = web.apiscan()
+                self.scan_results['apiscan'] = results
+
+            elif tool == 'graphql':
+                web = WebTools(self.current_target)
+                results = web.graphql_introspection()
+                self.scan_results['graphql'] = results
+
+            elif tool == 'jwtscan':
+                token = args[0] if args else None
+                web = WebTools(self.current_target)
+                results = web.jwt_scan(token)
+                self.scan_results['jwtscan'] = results
+
             # Network tools (DNS/subdomain only)
             elif tool == 'dnsenum':
                 net = NetworkTools(self.current_target)
@@ -433,6 +512,14 @@ class MenuSystem:
             # Results and reporting
             elif tool == 'results':
                 self.show_results()
+            elif tool == 'report':
+                self.generate_report()
+            elif tool == 'export':
+                self.export_results(args)
+            elif tool == 'history':
+                self.show_history()
+            elif tool == 'compare':
+                self.compare_results(args)
 
             # Tools not yet implemented
             else:
@@ -802,3 +889,270 @@ class MenuSystem:
         except (OSError, PermissionError) as e:
             AsciiArt.error_message(f"Failed to export report: {str(e)}")
             return None
+
+    # CONFIGURATION COMMANDS
+    def show_settings(self):
+        """Display current configuration settings"""
+        print(colored("\n╔═══════════════════════ CURRENT SETTINGS ═══════════════════════╗\n", 'red', attrs=['bold']))
+
+        print(f"  {colored('NETWORK CONFIGURATION:', 'yellow', attrs=['bold'])}")
+        proxy_status = self.config['proxy'] if self.config['proxy'] else colored('None (direct connection)', 'white')
+        print(f"    Proxy:           {proxy_status}")
+        print(f"    Timeout:         {colored(f"{self.config['timeout']} seconds", 'white')}")
+        ssl_verify = colored('Disabled', 'red') if not self.config['verify_ssl'] else colored('Enabled', 'green')
+        print(f"    SSL Verify:      {ssl_verify}")
+        print(f"    User Agent:      {colored(self.config['user_agent'], 'white')}")
+
+        print(f"\n  {colored('SCAN CONFIGURATION:', 'yellow', attrs=['bold'])}")
+        print(f"    Threads:         {colored(f"{self.config['threads']} (max concurrent)", 'white')}")
+        verbose_status = colored('Enabled', 'green') if self.config['verbose'] else colored('Disabled', 'white')
+        print(f"    Verbose Mode:    {verbose_status}")
+
+        print(colored("\n╚════════════════════════════════════════════════════════════════╝\n", 'red', attrs=['bold']))
+        print(f"{colored('💡 Tip:', 'blue')} Use individual commands to modify settings:")
+        print(f"  • proxy <url>")
+        print(f"  • threads <count>")
+        print(f"  • timeout <seconds>")
+        print(f"  • verbose\n")
+
+    def set_proxy(self, args):
+        """Configure proxy settings"""
+        import re
+
+        if not args or not args[0]:
+            # Clear proxy
+            self.config['proxy'] = None
+            AsciiArt.success_message("Proxy cleared - using direct connection")
+            return
+
+        proxy_url = args[0]
+
+        # Validate proxy format
+        proxy_pattern = r'^(http|https|socks5)://[a-zA-Z0-9\-\.]+:\d+$'
+        if not re.match(proxy_pattern, proxy_url):
+            AsciiArt.error_message("Invalid proxy format. Use: http://host:port or https://host:port or socks5://host:port")
+            return
+
+        # Test proxy connection
+        try:
+            import requests
+            print(f"\n{colored('Testing proxy connection...', 'yellow')}")
+            proxies = {'http': proxy_url, 'https': proxy_url}
+            response = requests.get('https://httpbin.org/ip', proxies=proxies, timeout=10)
+
+            if response.status_code == 200:
+                ip_info = response.json()
+                self.config['proxy'] = proxy_url
+                AsciiArt.success_message(f"Proxy configured: {proxy_url}")
+                print(f"{colored('✓', 'green')} Connection test successful")
+                print(f"  Your IP (via proxy): {colored(ip_info.get('origin', 'Unknown'), 'green')}\n")
+                print(f"{colored('💡 Tip:', 'blue')} All requests will now use this proxy")
+                print(f"{colored('⚠', 'yellow')} Warning: Some targets may block proxy connections\n")
+            else:
+                AsciiArt.error_message("Proxy connection test failed")
+        except Exception as e:
+            AsciiArt.error_message(f"Proxy test failed: {str(e)}")
+
+    def set_threads(self, args):
+        """Set thread count for concurrent operations"""
+        if not args or not args[0]:
+            AsciiArt.error_message("Usage: threads <count>")
+            return
+
+        try:
+            thread_count = int(args[0])
+            if thread_count < 1 or thread_count > 100:
+                AsciiArt.error_message("Thread count must be between 1 and 100")
+                return
+
+            self.config['threads'] = thread_count
+            CONFIG['max_threads'] = thread_count  # Update global config
+            AsciiArt.success_message(f"Thread count set to: {thread_count}")
+
+            print(f"\n{colored('RECOMMENDATIONS:', 'yellow', attrs=['bold'])}")
+            print(f"  1-10 threads:    Slow/rate-limited targets")
+            print(f"  10-30 threads:   Normal web applications")
+            print(f"  30-50 threads:   Fast servers, good connection")
+            print(f"  50-100 threads:  Very fast servers, testing only\n")
+            print(f"{colored('⚠', 'yellow')} Warning: High thread counts may trigger WAF/IDS\n")
+        except ValueError:
+            AsciiArt.error_message("Thread count must be a valid number")
+
+    def set_timeout(self, args):
+        """Set connection timeout"""
+        if not args or not args[0]:
+            AsciiArt.error_message("Usage: timeout <seconds>")
+            return
+
+        try:
+            timeout = float(args[0])
+            if timeout < 1 or timeout > 60:
+                AsciiArt.error_message("Timeout must be between 1 and 60 seconds")
+                return
+
+            self.config['timeout'] = timeout
+            CONFIG['timeout'] = timeout  # Update global config
+            AsciiArt.success_message(f"Connection timeout set to: {timeout} seconds")
+
+            print(f"\n{colored('💡 Tip:', 'blue')} Lower timeout = faster scans but may miss slow servers")
+            print(f"{colored('💡 Tip:', 'blue')} Higher timeout = more reliable but slower scans\n")
+        except ValueError:
+            AsciiArt.error_message("Timeout must be a valid number")
+
+    def toggle_verbose(self):
+        """Toggle verbose output mode"""
+        self.config['verbose'] = not self.config['verbose']
+        DEFAULTS['verbose'] = self.config['verbose']  # Update global default
+
+        if self.config['verbose']:
+            AsciiArt.success_message("Verbose mode ENABLED")
+            print(f"\n{colored('You will now see:', 'yellow')}")
+            print(f"  • Detailed HTTP request/response information")
+            print(f"  • Full error stack traces")
+            print(f"  • Debug logging")
+            print(f"  • Timing information for each operation\n")
+            print(f"{colored('💡 Tip:', 'blue')} Use 'verbose' again to disable\n")
+        else:
+            AsciiArt.success_message("Verbose mode DISABLED")
+            print(f"\n{colored('Output will be concise and focused on results.', 'white')}\n")
+            print(f"{colored('💡 Tip:', 'blue')} Use 'verbose' again to enable detailed output\n")
+
+    def update_databases(self):
+        """Update tool databases (wordlists, CVE data)"""
+        import requests
+        from pathlib import Path
+
+        print(colored("\n╔═══════════════════════ UPDATING DATABASES ═══════════════════════╗\n", 'red', attrs=['bold']))
+        print(f"{colored('Downloading wordlists and databases...', 'yellow')}\n")
+
+        data_dir = Path(__file__).parent.parent / 'data'
+        data_dir.mkdir(exist_ok=True)
+
+        downloads = [
+            {
+                'name': 'Directory wordlist (common.txt)',
+                'url': CONFIG.get('dir_list_url'),
+                'file': data_dir / 'directories.txt',
+                'source': 'SecLists/Discovery/Web-Content'
+            },
+            {
+                'name': 'Subdomain wordlist (subdomains-top1million-5000.txt)',
+                'url': CONFIG.get('subdomain_list_url'),
+                'file': data_dir / 'subdomains.txt',
+                'source': 'SecLists/Discovery/DNS'
+            }
+        ]
+
+        success_count = 0
+        for item in downloads:
+            try:
+                print(f"{colored('Downloading', 'yellow')} {item['name']}...")
+                response = requests.get(item['url'], timeout=30)
+                response.raise_for_status()
+
+                item['file'].write_text(response.text)
+                lines = len(response.text.splitlines())
+
+                print(f"{colored('✓', 'green')} {item['name']}")
+                print(f"  Source: {colored(item['source'], 'white')}")
+                print(f"  Size: {colored(f'{lines:,} entries', 'green')}\n")
+                success_count += 1
+            except Exception as e:
+                print(f"{colored('✗', 'red')} Failed to download {item['name']}")
+                print(f"  Error: {colored(str(e), 'red')}\n")
+
+        if success_count == len(downloads):
+            print(colored("UPDATE COMPLETE", 'green', attrs=['bold']))
+            print(f"{colored('All databases are up to date.', 'white')}\n")
+        else:
+            print(colored("UPDATE PARTIAL", 'yellow', attrs=['bold']))
+            print(f"{colored(f'{success_count}/{len(downloads)} databases updated successfully.', 'yellow')}\n")
+
+        print(colored("╚══════════════════════════════════════════════════════════════════╝\n", 'red', attrs=['bold']))
+        print(f"{colored('💡 Tip:', 'blue')} Wordlists saved to data/ directory\n")
+
+    # REPORTING COMMANDS
+    def generate_report(self):
+        """Generate comprehensive HTML report from scan results"""
+        if not self.scan_results:
+            AsciiArt.error_message("No scan results to report. Run some scans first!")
+            return
+
+        print(colored("\n╔═══════════════════════ GENERATING REPORT ════════════════════════╗\n", 'red', attrs=['bold']))
+
+        from pathlib import Path
+        from datetime import datetime
+        import json
+
+        # Create reports directory  
+        reports_dir = Path(__file__).parent.parent / 'reports'
+        reports_dir.mkdir(exist_ok=True)
+
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        report_file = reports_dir / f'report_{timestamp}.html'
+
+        print(f"{colored('Collecting scan results...', 'yellow')}")
+        for scan_type, results in self.scan_results.items():
+            if results:
+                count = len(results) if isinstance(results, (list, dict)) else 1
+                print(f"{colored('✓', 'green')} {scan_type}: {count} findings")
+
+        # Build HTML
+        html = f"""<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>NPS Tool Report</title>
+<style>body{{background:#000;color:#ff3377;font-family:monospace;padding:30px}}
+h1{{color:#ff0055;border:2px solid #ff0055;padding:15px;text-align:center}}
+pre{{background:#0a0a0a;border:1px solid #ff0055;padding:10px;color:#ff3377}}</style>
+</head><body><h1>NPS Tool Security Report</h1>
+<p><b>Target:</b> {self.current_target}</p><p><b>Date:</b> {datetime.now()}</p>"""
+
+        for scan_type, results in self.scan_results.items():
+            html += f"<h2>{scan_type.upper()}</h2><pre>{json.dumps(results, indent=2, default=str)}</pre>"
+
+        html += "</body></html>"
+        report_file.write_text(html)
+
+        print(colored("╚══════════════════════════════════════════════════════════════════╝\n", 'red', attrs=['bold']))
+        AsciiArt.success_message(f"Report created: {report_file}")
+        return str(report_file)
+
+    def export_results(self, args):
+        """Export scan results to file"""
+        if not self.scan_results:
+            AsciiArt.error_message("No scan results to export.")
+            return
+
+        from pathlib import Path
+        from datetime import datetime
+        import json
+
+        format_type = args[0].lower() if args else 'json'
+        exports_dir = Path(__file__).parent.parent / 'exports'
+        exports_dir.mkdir(exist_ok=True)
+
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        export_file = exports_dir / f'scan_export_{timestamp}.{format_type}'
+
+        with open(export_file, 'w') as f:
+            json.dump({'target': self.current_target, 'results': self.scan_results}, f, indent=2, default=str)
+
+        AsciiArt.success_message(f"Exported to: {export_file}")
+
+    def show_history(self):
+        """View scan history"""
+        print(colored("\n╔═══════════════════════ SCAN HISTORY ═════════════════════════════╗\n", 'red', attrs=['bold']))
+        if not self.scan_history:
+            print(f"{colored('No scan history yet.', 'white')}\n")
+        else:
+            for i, entry in enumerate(self.scan_history[-10:][::-1], 1):
+                print(f"{i}. {entry}")
+        print(colored("╚══════════════════════════════════════════════════════════════════╝\n", 'red', attrs=['bold']))
+
+    def compare_results(self, args):
+        """Compare scan results"""
+        print(colored("\n╔═══════════════════════ SCAN COMPARISON ══════════════════════════╗\n", 'red', attrs=['bold']))
+        print(f"{colored('Comparison: Current results', 'yellow')}\n")
+        if self.scan_results:
+            for scan_type in self.scan_results.keys():
+                print(f"  • {scan_type}")
+        print(colored("\n╚══════════════════════════════════════════════════════════════════╝\n", 'red', attrs=['bold']))

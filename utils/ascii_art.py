@@ -45,8 +45,8 @@ class AsciiArt:
 │  Advanced Web Security Testing         │
 ╚════════════════════════════════════════╝"""
 
-        # Combine all parts
-        banner = colored(account_box, 'cyan') + colored(separator, 'cyan') + "\n" + colored(title_box, 'cyan')
+        # Combine all parts with neon red theme
+        banner = colored(account_box, 'red') + colored(separator, 'red') + "\n" + colored(title_box, 'red')
 
         return banner
 
@@ -97,7 +97,7 @@ class AsciiArt:
             "Loading WAF detection system"
         ]
 
-        colors = ['red', 'yellow', 'green', 'cyan', 'magenta']
+        colors = ['red', 'yellow', 'green']  # Neon red-spectrum cycling
 
         for i in range(6):
             sys.stdout.write('\033[2J\033[H')  # Clear screen
@@ -171,38 +171,38 @@ class AsciiArt:
 
     @staticmethod
     def tool_category_banner(category):
-        """Generate banner for tool categories"""
+        """Generate banner for tool categories with neon red theme"""
         banners = {
             'recon': colored("""
     ╔══════════════════════════════════════╗
     ║   🔍 RECONNAISSANCE & ENUMERATION    ║
     ╚══════════════════════════════════════╝
-            """, 'cyan'),
+            """, 'magenta'),  # Lighter pink-red
             'exploit': colored("""
     ╔══════════════════════════════════════╗
     ║   💣 EXPLOITATION & WEAPONIZATION    ║
     ╚══════════════════════════════════════╝
-            """, 'red'),
+            """, 'red'),  # Neon red
             'web': colored("""
     ╔══════════════════════════════════════╗
     ║   🌐 WEB APPLICATION TESTING         ║
     ╚══════════════════════════════════════╝
-            """, 'yellow'),
+            """, 'red'),  # Neon red
             'wireless': colored("""
     ╔══════════════════════════════════════╗
     ║   📡 WIRELESS SECURITY ASSESSMENT    ║
     ╚══════════════════════════════════════╝
-            """, 'magenta'),
+            """, 'magenta'),  # Lighter pink-red
             'password': colored("""
     ╔══════════════════════════════════════╗
     ║   🔐 PASSWORD & HASH CRACKING        ║
     ╚══════════════════════════════════════╝
-            """, 'blue'),
+            """, 'red'),  # Neon red
             'forensics': colored("""
     ╔══════════════════════════════════════╗
     ║   🔬 DIGITAL FORENSICS & OSINT       ║
     ╚══════════════════════════════════════╝
-            """, 'green')
+            """, 'magenta')  # Lighter pink-red
         }
         return banners.get(category, "")
 
@@ -224,4 +224,4 @@ class AsciiArt:
     @staticmethod
     def info_message(text):
         """Beautiful info message"""
-        print(f"\n{colored('ℹ', 'cyan', attrs=['bold'])} {colored(text, 'cyan')}\n")
+        print(f"\n{colored('ℹ', 'blue', attrs=['bold'])} {colored(text, 'blue')}\n")  # Lighter pink-red
