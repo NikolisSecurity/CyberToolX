@@ -819,3 +819,184 @@ class MenuSystem:
         except (OSError, PermissionError) as e:
             AsciiArt.error_message(f"Failed to export report: {str(e)}")
             return None
+
+    # CONFIGURATION COMMANDS
+    def show_settings(self):
+        """Display current configuration settings"""
+        print(colored("\n╔═══════════════════════ CURRENT SETTINGS ═══════════════════════╗\n", 'red', attrs=['bold']))
+
+        print(f"  {colored('NETWORK CONFIGURATION:', 'yellow', attrs=['bold'])}")
+        proxy_status = self.config['proxy'] if self.config['proxy'] else colored('None (direct connection)', 'white')
+        print(f"    Proxy:           {proxy_status}")
+        print(f"    Timeout:         {colored(f"{self.config['timeout']} seconds", 'white')}")
+        ssl_verify = colored('Disabled', 'red') if not self.config['verify_ssl'] else colored('Enabled', 'green')
+        print(f"    SSL Verify:      {ssl_verify}")
+        print(f"    User Agent:      {colored(self.config['user_agent'], 'white')}")
+
+        print(f"\n  {colored('SCAN CONFIGURATION:', 'yellow', attrs=['bold'])}")
+        print(f"    Threads:         {colored(f"{self.config['threads']} (max concurrent)", 'white')}")
+        verbose_status = colored('Enabled', 'green') if self.config['verbose'] else colored('Disabled', 'white')
+        print(f"    Verbose Mode:    {verbose_status}")
+
+        print(colored("\n╚════════════════════════════════════════════════════════════════╝\n", 'red', attrs=['bold']))
+        print(f"{colored('💡 Tip:', 'blue')} Use individual commands to modify settings:")
+        print(f"  • proxy <url>")
+        print(f"  • threads <count>")
+        print(f"  • timeout <seconds>")
+        print(f"  • verbose\n")
+
+    def set_proxy(self, args):
+        """Configure proxy settings"""
+        import re
+
+        if not args or not args[0]:
+            # Clear proxy
+            self.config['proxy'] = None
+            AsciiArt.success_message("Proxy cleared - using direct connection")
+            return
+
+        proxy_url = args[0]
+
+        # Validate proxy format
+        proxy_pattern = r'^(http|https|socks5)://[a-zA-Z0-9\-\.]+:\d+$'
+        if not re.match(proxy_pattern, proxy_url):
+            AsciiArt.error_message("Invalid proxy format. Use: http://host:port or https://host:port or socks5://host:port")
+            return
+
+        # Test proxy connection
+        try:
+            import requests
+            print(f"\n{colored('Testing proxy connection...', 'yellow')}")
+            proxies = {'http': proxy_url, 'https': proxy_url}
+            response = requests.get('https://httpbin.org/ip', proxies=proxies, timeout=10)
+
+            if response.status_code == 200:
+                ip_info = response.json()
+                self.config['proxy'] = proxy_url
+                AsciiArt.success_message(f"Proxy configured: {proxy_url}")
+                print(f"{colored('✓', 'green')} Connection test successful")
+                print(f"  Your IP (via proxy): {colored(ip_info.get('origin', 'Unknown'), 'green')}\n")
+                print(f"{colored('💡 Tip:', 'blue')} All requests will now use this proxy")
+                print(f"{colored('⚠', 'yellow')} Warning: Some targets may block proxy connections\n")
+            else:
+                AsciiArt.error_message("Proxy connection test failed")
+        except Exception as e:
+            AsciiArt.error_message(f"Proxy test failed: {str(e)}")
+
+    def set_threads(self, args):
+        """Set thread count for concurrent operations"""
+        if not args or not args[0]:
+            AsciiArt.error_message("Usage: threads <count>")
+            return
+
+        try:
+            thread_count = int(args[0])
+            if thread_count < 1 or thread_count > 100:
+                AsciiArt.error_message("Thread count must be between 1 and 100")
+                return
+
+            self.config['threads'] = thread_count
+            CONFIG['max_threads'] = thread_count  # Update global config
+            AsciiArt.success_message(f"Thread count set to: {thread_count}")
+
+            print(f"\n{colored('RECOMMENDATIONS:', 'yellow', attrs=['bold'])}")
+            print(f"  1-10 threads:    Slow/rate-limited targets")
+            print(f"  10-30 threads:   Normal web applications")
+            print(f"  30-50 threads:   Fast servers, good connection")
+            print(f"  50-100 threads:  Very fast servers, testing only\n")
+            print(f"{colored('⚠', 'yellow')} Warning: High thread counts may trigger WAF/IDS\n")
+        except ValueError:
+            AsciiArt.error_message("Thread count must be a valid number")
+
+    def set_timeout(self, args):
+        """Set connection timeout"""
+        if not args or not args[0]:
+            AsciiArt.error_message("Usage: timeout <seconds>")
+            return
+
+        try:
+            timeout = float(args[0])
+            if timeout < 1 or timeout > 60:
+                AsciiArt.error_message("Timeout must be between 1 and 60 seconds")
+                return
+
+            self.config['timeout'] = timeout
+            CONFIG['timeout'] = timeout  # Update global config
+            AsciiArt.success_message(f"Connection timeout set to: {timeout} seconds")
+
+            print(f"\n{colored('💡 Tip:', 'blue')} Lower timeout = faster scans but may miss slow servers")
+            print(f"{colored('💡 Tip:', 'blue')} Higher timeout = more reliable but slower scans\n")
+        except ValueError:
+            AsciiArt.error_message("Timeout must be a valid number")
+
+    def toggle_verbose(self):
+        """Toggle verbose output mode"""
+        self.config['verbose'] = not self.config['verbose']
+        DEFAULTS['verbose'] = self.config['verbose']  # Update global default
+
+        if self.config['verbose']:
+            AsciiArt.success_message("Verbose mode ENABLED")
+            print(f"\n{colored('You will now see:', 'yellow')}")
+            print(f"  • Detailed HTTP request/response information")
+            print(f"  • Full error stack traces")
+            print(f"  • Debug logging")
+            print(f"  • Timing information for each operation\n")
+            print(f"{colored('💡 Tip:', 'blue')} Use 'verbose' again to disable\n")
+        else:
+            AsciiArt.success_message("Verbose mode DISABLED")
+            print(f"\n{colored('Output will be concise and focused on results.', 'white')}\n")
+            print(f"{colored('💡 Tip:', 'blue')} Use 'verbose' again to enable detailed output\n")
+
+    def update_databases(self):
+        """Update tool databases (wordlists, CVE data)"""
+        import requests
+        from pathlib import Path
+
+        print(colored("\n╔═══════════════════════ UPDATING DATABASES ═══════════════════════╗\n", 'red', attrs=['bold']))
+        print(f"{colored('Downloading wordlists and databases...', 'yellow')}\n")
+
+        data_dir = Path(__file__).parent.parent / 'data'
+        data_dir.mkdir(exist_ok=True)
+
+        downloads = [
+            {
+                'name': 'Directory wordlist (common.txt)',
+                'url': CONFIG.get('dir_list_url'),
+                'file': data_dir / 'directories.txt',
+                'source': 'SecLists/Discovery/Web-Content'
+            },
+            {
+                'name': 'Subdomain wordlist (subdomains-top1million-5000.txt)',
+                'url': CONFIG.get('subdomain_list_url'),
+                'file': data_dir / 'subdomains.txt',
+                'source': 'SecLists/Discovery/DNS'
+            }
+        ]
+
+        success_count = 0
+        for item in downloads:
+            try:
+                print(f"{colored('Downloading', 'yellow')} {item['name']}...")
+                response = requests.get(item['url'], timeout=30)
+                response.raise_for_status()
+
+                item['file'].write_text(response.text)
+                lines = len(response.text.splitlines())
+
+                print(f"{colored('✓', 'green')} {item['name']}")
+                print(f"  Source: {colored(item['source'], 'white')}")
+                print(f"  Size: {colored(f'{lines:,} entries', 'green')}\n")
+                success_count += 1
+            except Exception as e:
+                print(f"{colored('✗', 'red')} Failed to download {item['name']}")
+                print(f"  Error: {colored(str(e), 'red')}\n")
+
+        if success_count == len(downloads):
+            print(colored("UPDATE COMPLETE", 'green', attrs=['bold']))
+            print(f"{colored('All databases are up to date.', 'white')}\n")
+        else:
+            print(colored("UPDATE PARTIAL", 'yellow', attrs=['bold']))
+            print(f"{colored(f'{success_count}/{len(downloads)} databases updated successfully.', 'yellow')}\n")
+
+        print(colored("╚══════════════════════════════════════════════════════════════════╝\n", 'red', attrs=['bold']))
+        print(f"{colored('💡 Tip:', 'blue')} Wordlists saved to data/ directory\n")
