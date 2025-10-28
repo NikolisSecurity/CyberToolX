@@ -14,7 +14,7 @@
 ## 🚀 Quick Start
 
 ```bash
-cd /workspace/cmh8969s900cor7i3v4rbn8n9/CyberToolX
+cd /yourdir/CyberToolX
 python3 main.py
 ```
 
