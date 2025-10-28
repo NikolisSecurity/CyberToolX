@@ -440,6 +440,48 @@ class MenuSystem:
                 results = web.cms_detect()
                 self.scan_results['cmsscan'] = results
 
+            # New web testing tools
+            elif tool == 'webscan':
+                web = WebTools(self.current_target)
+                results = web.webscan()
+                self.scan_results['webscan'] = results
+
+            elif tool == 'dirscan':
+                web = WebTools(self.current_target)
+                results = web.dirscan()
+                self.scan_results['dirscan'] = results
+
+            elif tool == 'sqlmap':
+                web = WebTools(self.current_target)
+                results = web.sqlmap_scan()
+                self.scan_results['sqlmap'] = results
+
+            elif tool == 'xsstest':
+                web = WebTools(self.current_target)
+                results = web.xss_test()
+                self.scan_results['xsstest'] = results
+
+            elif tool == 'csrftest':
+                web = WebTools(self.current_target)
+                results = web.csrf_test()
+                self.scan_results['csrftest'] = results
+
+            elif tool == 'apiscan':
+                web = WebTools(self.current_target)
+                results = web.apiscan()
+                self.scan_results['apiscan'] = results
+
+            elif tool == 'graphql':
+                web = WebTools(self.current_target)
+                results = web.graphql_introspection()
+                self.scan_results['graphql'] = results
+
+            elif tool == 'jwtscan':
+                token = args[0] if args else None
+                web = WebTools(self.current_target)
+                results = web.jwt_scan(token)
+                self.scan_results['jwtscan'] = results
+
             # Network tools (DNS/subdomain only)
             elif tool == 'dnsenum':
                 net = NetworkTools(self.current_target)
