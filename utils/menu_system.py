@@ -11,6 +11,10 @@ from .color_compat import colored
 from .ascii_art import AsciiArt
 from .command_parser import CommandParser
 
+# Import configuration
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config import CONFIG, DEFAULTS
+
 
 class MenuSystem:
     """Interactive menu-driven interface"""
@@ -19,6 +23,19 @@ class MenuSystem:
         self.running = True
         self.current_target = None
         self.scan_results = {}
+
+        # Configuration settings
+        self.config = {
+            'proxy': None,
+            'threads': CONFIG.get('max_threads', 50),
+            'timeout': CONFIG.get('timeout', 5),
+            'verbose': DEFAULTS.get('verbose', False),
+            'user_agent': CONFIG.get('user_agent', 'CyberGuardian/2.0'),
+            'verify_ssl': DEFAULTS.get('verify_ssl', False),
+        }
+
+        # Scan history tracking
+        self.scan_history = []
 
         # Metrics tracking
         self.metrics_file = Path(__file__).parent.parent / 'data' / 'command_metrics.json'
