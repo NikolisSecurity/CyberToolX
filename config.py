@@ -10,9 +10,11 @@ CONFIG = {
     'exploit_db_api': 'https://exploit-db.com/search',
     'github_repo': 'https://github.com/NikolisSecurity/CyberToolX.git',
     'update_check_interval': 3600,
-    'banner_color': 'cyan',
-    'highlight_color': 'yellow',
-    'critical_color': 'red',
+    'banner_color': 'red',        # Neon red theme (#ff0055)
+    'highlight_color': 'red',     # Neon red for highlights
+    'critical_color': 'red',      # Neon red for critical items
+    'success_color': 'green',     # Neon green (#00ff88)
+    'warning_color': 'yellow',    # Neon orange (#ffaa00)
     'max_threads': 50,
     'timeout': 5,
     'user_agent': 'CyberGuardian/2.0',
