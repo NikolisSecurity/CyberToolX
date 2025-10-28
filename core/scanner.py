@@ -334,28 +334,110 @@ class CyberSentinel:
             return None
 
     def _generate_html_report(self, filename):
-        """Generate HTML report with XSS protection"""
+        """Generate HTML report with neon cyberpunk theme and XSS protection"""
         with open(filename, 'w', encoding='utf-8') as f:
             f.write(f"""
+            <!DOCTYPE html>
             <html>
                 <head>
-                    <title>CyberGuardian Report - {escape(self.findings['target'])}</title>
+                    <meta charset="UTF-8">
+                    <title>NPS Tool Security Report - {escape(self.findings['target'])}</title>
                     <style>
-                        body {{ font-family: Arial, sans-serif; padding: 20px; }}
-                        .vulnerability {{ color: #dc3545; font-weight: bold; }}
-                        .exploit {{ color: #ff6a00; }}
-                        .ip {{ color: #0d6efd; }}
-                        a {{ color: #0d6efd; text-decoration: none; }}
-                        a:hover {{ text-decoration: underline; }}
-                        ul {{ list-style-type: none; padding-left: 20px; }}
-                        li {{ margin-bottom: 10px; }}
+                        body {{
+                            font-family: 'Courier New', monospace;
+                            padding: 30px;
+                            background: #000000;
+                            color: #ff3377;
+                            line-height: 1.6;
+                        }}
+                        h1 {{
+                            color: #ff0055;
+                            text-shadow: 0 0 10px rgba(255, 0, 85, 0.5);
+                            border: 2px solid #ff0055;
+                            padding: 15px;
+                            box-shadow: 0 0 20px rgba(255, 0, 85, 0.3);
+                            background: #0a0000;
+                        }}
+                        h2 {{
+                            color: #ff0055;
+                            text-shadow: 0 0 8px rgba(255, 0, 85, 0.4);
+                            border-left: 4px solid #ff0055;
+                            padding-left: 10px;
+                            margin-top: 30px;
+                        }}
+                        h3 {{
+                            color: #ff3377;
+                            border-bottom: 1px solid #ff0055;
+                            padding-bottom: 5px;
+                        }}
+                        .vulnerability {{
+                            color: #ff0055;
+                            font-weight: bold;
+                            text-shadow: 0 0 5px rgba(255, 0, 85, 0.3);
+                        }}
+                        .exploit {{
+                            color: #ffaa00;
+                            font-weight: bold;
+                        }}
+                        .safe {{
+                            color: #00ff88;
+                            font-weight: bold;
+                        }}
+                        .ip {{
+                            color: #ff3377;
+                            font-weight: bold;
+                        }}
+                        a {{
+                            color: #ff3377;
+                            text-decoration: none;
+                            border-bottom: 1px dashed #ff3377;
+                        }}
+                        a:hover {{
+                            color: #ff0055;
+                            text-shadow: 0 0 5px rgba(255, 0, 85, 0.5);
+                        }}
+                        ul {{
+                            list-style-type: none;
+                            padding-left: 20px;
+                        }}
+                        li {{
+                            margin-bottom: 15px;
+                            padding: 10px;
+                            background: #0a0000;
+                            border-left: 3px solid #ff0055;
+                        }}
+                        li:hover {{
+                            background: #0a0a0a;
+                            box-shadow: 0 0 10px rgba(255, 0, 85, 0.2);
+                        }}
+                        .metadata {{
+                            background: #0a0000;
+                            border: 2px solid #ff0055;
+                            padding: 15px;
+                            margin-bottom: 20px;
+                            box-shadow: 0 0 15px rgba(255, 0, 85, 0.2);
+                        }}
+                        small {{
+                            color: #ff3377;
+                            opacity: 0.8;
+                        }}
+                        i {{
+                            color: #ff3377;
+                            opacity: 0.7;
+                        }}
+                        b {{
+                            color: #ff0055;
+                        }}
                     </style>
                 </head>
                 <body>
-                    <h1>Security Report for {escape(self.findings['target'])}</h1>
-                    <h3>Scan ID: {escape(self.session_id)}</h3>
+                    <h1>🔒 NPS Tool Security Report</h1>
+                    <div class="metadata">
+                        <p><b>Target:</b> <span class="ip">{escape(self.findings['target'])}</span></p>
+                        <p><b>Scan ID:</b> {escape(self.session_id)}</p>
+                    </div>
 
-                    <h2>Network Discovery</h2>
+                    <h2>🌐 Network Discovery</h2>
                     <h3>Resolved IP Addresses</h3>
                     <ul>
                         {"".join(f"<li class='ip'>{escape(ip)}</li>" for ip in self.findings['ips'])}
@@ -365,12 +447,12 @@ class CyberSentinel:
                     <ul>
                         {"".join(
                             f"<li><b>{escape(service['ip'])}:{escape(str(service['port']))}</b> - {escape(service['service'])} "
-                            f"(v{escape(service['version'])})</li>"
+                            f"<small>(v{escape(service['version'])})</small></li>"
                             for service in self.findings['ports']
                         )}
                     </ul>
 
-                    <h2>Security Findings</h2>
+                    <h2>⚠️ Security Findings</h2>
                     <h3>Vulnerabilities ({len(self.findings['vulnerabilities'])})</h3>
                     <ul>
                         {"".join(
@@ -391,11 +473,11 @@ class CyberSentinel:
                         )}
                     </ul>
 
-                    <h2>Web Directory Discovery ({len(self.findings['directories'])})</h2>
+                    <h2>📁 Web Directory Discovery ({len(self.findings['directories'])})</h2>
                     <ul>
                         {"".join(
                             f"<li><a href='{escape(dir['url'])}' target='_blank'>{escape(dir['url'])}</a> "
-                            f"(HTTP {escape(str(dir['status']))})</li>"
+                            f"<small>(HTTP {escape(str(dir['status']))})</small></li>"
                             for dir in self.findings['directories']
                         )}
                     </ul>
