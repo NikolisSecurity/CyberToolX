@@ -45,8 +45,8 @@ class AsciiArt:
 │  Advanced Web Security Testing         │
 ╚════════════════════════════════════════╝"""
 
-        # Combine all parts
-        banner = colored(account_box, 'cyan') + colored(separator, 'cyan') + "\n" + colored(title_box, 'cyan')
+        # Combine all parts with neon red theme
+        banner = colored(account_box, 'red') + colored(separator, 'red') + "\n" + colored(title_box, 'red')
 
         return banner
 
@@ -97,7 +97,7 @@ class AsciiArt:
             "Loading WAF detection system"
         ]
 
-        colors = ['red', 'yellow', 'green', 'cyan', 'magenta']
+        colors = ['red', 'yellow', 'green']  # Neon red-spectrum cycling
 
         for i in range(6):
             sys.stdout.write('\033[2J\033[H')  # Clear screen
