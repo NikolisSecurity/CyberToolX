@@ -1,4 +1,4 @@
-# 🌐 NPS Tool v1.0
+# 🌐 NPS Tool v2.0
 
 **Network Pentesting Suite - Web Security Edition**
 
