@@ -200,8 +200,8 @@ class MenuSystem:
 
     def _update_system_stats(self):
         """Update system statistics for sidebar display"""
-        import psutil
         try:
+            import psutil
             self.system_stats = {
                 'cpu_usage': psutil.cpu_percent(),
                 'memory_usage': psutil.virtual_memory().percent,
