@@ -263,8 +263,8 @@ class DashboardRenderer:
         positions = self.layout_engine.position_elements()
         terminal_width, terminal_height = self.layout_engine.detector.get_terminal_size()
 
-        # Create a buffer for the entire dashboard
-        dashboard_buffer = [''] * terminal_height
+        # Create a buffer for the entire dashboard with proper line lengths
+        dashboard_buffer = [' ' * terminal_width for _ in range(terminal_height)]
 
         # Render each panel and place it in the buffer
         panels_to_render = [
@@ -284,19 +284,32 @@ class DashboardRenderer:
                     if 0 <= y_pos < len(dashboard_buffer):
                         # Insert line at correct horizontal position
                         x_pos = panel_pos['x'] - 1
+
+                        # Ensure buffer line is long enough
+                        while len(dashboard_buffer[y_pos]) < x_pos:
+                            dashboard_buffer[y_pos] += ' '
+
+                        # Handle panel merging properly
                         if x_pos == 0:
+                            # Panel starts at beginning, replace entire line
                             dashboard_buffer[y_pos] = line
                         else:
-                            # Ensure buffer line is long enough
-                            while len(dashboard_buffer[y_pos]) < x_pos:
-                                dashboard_buffer[y_pos] += ' '
-                            dashboard_buffer[y_pos] = dashboard_buffer[y_pos][:x_pos] + line
+                            # Panel is positioned after existing content
+                            buffer_line = dashboard_buffer[y_pos]
+                            if len(buffer_line) >= x_pos:
+                                # Overwrite existing content at this position
+                                dashboard_buffer[y_pos] = buffer_line[:x_pos] + line
+                            else:
+                                # Append to buffer line (shouldn't happen with proper layout)
+                                dashboard_buffer[y_pos] = buffer_line + ' ' * (x_pos - len(buffer_line)) + line
 
         # Clear screen and render dashboard
         sys.stdout.write('\033[2J\033[H')  # Clear screen and move cursor to top
+
+        # Render all lines, including empty ones for proper spacing
         for line in dashboard_buffer:
-            if line.strip():  # Only print non-empty lines
-                sys.stdout.write(line + '\n')
+            # Ensure all lines are printed to maintain layout integrity
+            sys.stdout.write(line + '\n')
         sys.stdout.flush()
 
         self.last_render = {

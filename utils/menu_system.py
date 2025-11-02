@@ -188,6 +188,10 @@ class MenuSystem:
                 'Commands': len(self.content_history)
             }
 
+            # Add system stats if available
+            if self.system_stats:
+                sidebar_stats.update(self.system_stats)
+
             # Get recent content for main panel
             recent_content = self.content_history[-20:] if self.content_history else ["Welcome to NPS Tool", "Type 'help' for available commands"]
 
