@@ -754,7 +754,13 @@ class MenuSystem:
             elif command == 'verbose':
                 self.toggle_verbose()
             elif command == 'update':
+                self.handle_update_command(args)
+            elif command == 'update tool':
+                self.update_tool_from_github()
+            elif command == 'update databases':
                 self.update_databases()
+            elif command == 'check-updates':
+                self.check_for_updates()
 
             # Tool execution - placeholder for now
             else:
