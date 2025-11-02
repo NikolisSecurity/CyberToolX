@@ -1563,7 +1563,8 @@ pre{{background:#0a0a0a;border:1px solid #ff0055;padding:10px;color:#ff3377}}</s
                     return True
             else:
                 print(colored("UPDATE FAILED", 'red', attrs=['bold']))
-                print(f"{colored(f'Error: {result.get(\"error\", \"Unknown error\")}', 'red')}\n")
+                error_msg = result.get("error", "Unknown error")
+                print(f"{colored(f'Error: {error_msg}', 'red')}\n")
                 return False
 
         except Exception as e:
