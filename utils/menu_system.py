@@ -21,7 +21,7 @@ from config import CONFIG, DEFAULTS
 
 
 class MenuSystem:
-    """Interactive menu-driven interface"""
+    """Interactive menu-driven interface with enhanced dashboard"""
 
     def __init__(self):
         self.running = True
@@ -45,6 +45,19 @@ class MenuSystem:
         self.metrics_file = Path(__file__).parent.parent / 'data' / 'command_metrics.json'
         self._ensure_metrics_file()
 
+        # Enhanced dashboard components
+        self.terminal_detector = TerminalDetector()
+        self.layout_engine = LayoutEngine(self.terminal_detector)
+        self.dashboard_renderer = DashboardRenderer(self.layout_engine)
+        self.animation_controller = AnimationController()
+        self.progress_indicator = ProgressIndicator(self.animation_controller)
+
+        # Dashboard state
+        self.dashboard_active = False
+        self.content_history = []
+        self.status_notifications = []
+        self.system_stats = {}
+
         # Define all available commands
         self.commands = {
             # Main Menu
@@ -54,6 +67,7 @@ class MenuSystem:
             'quit': 'Exit NPS Tool',
             'banner': 'Display the main banner',
             'about': 'About NPS Tool',
+            'dashboard': 'Toggle enhanced dashboard mode',
 
             # Target Management
             'target': 'Set target for scanning (usage: target <ip/domain>)',
@@ -110,10 +124,22 @@ class MenuSystem:
             'stats': 'Display command usage statistics',
             'timeline': 'Show command usage timeline',
             'performance': 'Show command performance metrics',
-            'exportstats': 'Export analytics to report file'
+            'exportstats': 'Export analytics to report file',
+
+            # Enhanced Interface Commands
+            'theme': 'Change color theme (usage: theme <name>)',
+            'style': 'Change banner style (usage: style <circuit|security|data>)',
+            'animate': 'Toggle animations on/off',
+            'layout': 'Force layout recalculation'
         }
 
         self.parser = CommandParser(self.commands)
+
+        # Set current banner style
+        self.banner_style = 'circuit_board'
+
+        # Initialize dashboard
+        self._initialize_dashboard()
 
     def clear_screen(self):
         """Clear terminal screen"""
