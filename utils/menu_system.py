@@ -432,7 +432,7 @@ class MenuSystem:
             'DNS & Subdomain': ['dnsenum', 'subdomain'],
             'Web OSINT': ['emailharvest', 'metadata', 'techstack'],
             'Reporting': ['results', 'report', 'export', 'history', 'compare'],
-            'Configuration': ['settings', 'proxy', 'threads', 'timeout', 'verbose', 'update'],
+            'Configuration': ['settings', 'proxy', 'threads', 'timeout', 'verbose', 'update', 'update tool', 'update databases', 'check-updates'],
             'Analytics': ['stats', 'timeline', 'performance', 'exportstats'],
             'Advanced': ['script', 'schedule', 'monitor', 'honeypot', 'custom']
         }
@@ -471,7 +471,7 @@ class MenuSystem:
             'DNS & Subdomain': ['dnsenum', 'subdomain'],
             'Web OSINT': ['emailharvest', 'metadata', 'techstack'],
             'Reporting': ['results', 'report', 'export', 'history', 'compare'],
-            'Configuration': ['settings', 'proxy', 'threads', 'timeout', 'verbose', 'update'],
+            'Configuration': ['settings', 'proxy', 'threads', 'timeout', 'verbose', 'update', 'update tool', 'update databases', 'check-updates'],
             'Analytics': ['stats', 'timeline', 'performance', 'exportstats'],
             'Advanced': ['script', 'schedule', 'monitor', 'honeypot', 'custom']
         }
