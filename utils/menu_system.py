@@ -19,6 +19,12 @@ from .progress_indicators import ProgressIndicator
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import CONFIG, DEFAULTS
 
+# Import GitHub updater
+try:
+    from updater.github import GitHubUpdater
+except ImportError:
+    GitHubUpdater = None
+
 
 class MenuSystem:
     """Interactive menu-driven interface with enhanced dashboard"""
