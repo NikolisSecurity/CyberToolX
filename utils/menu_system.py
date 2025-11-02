@@ -682,17 +682,40 @@ class MenuSystem:
             elif command == 'target':
                 if args:
                     self.current_target = args[0]
-                    AsciiArt.success_message(f"Target set to: {self.current_target}")
+                    success_msg = f"Target set to: {self.current_target}"
+                    self.add_content(success_msg)
+                    self.add_notification(f"Target changed: {self.current_target}")
+                    if self.dashboard_active:
+                        self.render_dashboard()
+                    else:
+                        AsciiArt.success_message(success_msg)
                 else:
-                    AsciiArt.error_message("Usage: target <ip/domain>")
+                    error_msg = "Usage: target <ip/domain>"
+                    self.add_content(error_msg)
+                    if not self.dashboard_active:
+                        AsciiArt.error_message(error_msg)
             elif command == 'showtarget':
                 if self.current_target:
-                    print(f"\n{colored('Current target:', 'cyan')} {colored(self.current_target, 'green', attrs=['bold'])}\n")
+                    target_msg = f"Current target: {self.current_target}"
+                    self.add_content(target_msg)
+                    if self.dashboard_active:
+                        self.render_dashboard()
+                    else:
+                        print(f"\n{colored('Current target:', 'cyan')} {colored(self.current_target, 'green', attrs=['bold'])}\n")
                 else:
-                    AsciiArt.warning_message("No target set. Use 'target <ip/domain>' to set one.")
+                    warning_msg = "No target set. Use 'target <ip/domain>' to set one."
+                    self.add_content(warning_msg)
+                    if not self.dashboard_active:
+                        AsciiArt.warning_message(warning_msg)
             elif command == 'cleartarget':
                 self.current_target = None
-                AsciiArt.success_message("Target cleared")
+                success_msg = "Target cleared"
+                self.add_content(success_msg)
+                self.add_notification("Target cleared")
+                if self.dashboard_active:
+                    self.render_dashboard()
+                else:
+                    AsciiArt.success_message(success_msg)
 
             # Analytics commands
             elif command == 'stats':
