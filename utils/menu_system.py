@@ -145,6 +145,169 @@ class MenuSystem:
         """Clear terminal screen"""
         os.system('clear' if os.name != 'nt' else 'cls')
 
+    def _initialize_dashboard(self):
+        """Initialize the dashboard system"""
+        try:
+            self.dashboard_renderer.activate()
+            self.dashboard_active = True
+            self._update_system_stats()
+        except Exception as e:
+            print(colored(f"Warning: Dashboard initialization failed: {e}", 'yellow'))
+            self.dashboard_active = False
+
+    def detect_terminal_size(self):
+        """Detect terminal size and determine optimal layout preset"""
+        return self.terminal_detector.determine_preset()
+
+    def render_dashboard(self):
+        """Render the multi-panel dashboard interface"""
+        if not self.dashboard_active:
+            return
+
+        try:
+            # Update system stats
+            self._update_system_stats()
+
+            # Prepare content for dashboard
+            terminal_info = self.terminal_detector.get_capabilities()
+            sidebar_stats = {
+                'Terminal': f"{terminal_info['size'][0]}x{terminal_info['size'][1]}",
+                'Preset': terminal_info['preset'].value,
+                'Unicode': 'Yes' if terminal_info['unicode'] else 'No',
+                'Colors': terminal_info['color_level'],
+                'Target': self.current_target or 'Not Set',
+                'Commands': len(self.content_history)
+            }
+
+            # Get recent content for main panel
+            recent_content = self.content_history[-20:] if self.content_history else ["Welcome to NPS Tool", "Type 'help' for available commands"]
+
+            # Render dashboard
+            self.dashboard_renderer.refresh_dashboard(
+                header_title="NPS TOOL",
+                sidebar_target=self.current_target or "Not Set",
+                sidebar_stats=sidebar_stats,
+                main_content=recent_content,
+                status_notifications=self.status_notifications[-5:] if self.status_notifications else None
+            )
+        except Exception as e:
+            print(colored(f"Dashboard render error: {e}", 'red'))
+
+    def update_panels(self):
+        """Update specific dashboard sections"""
+        if self.dashboard_active:
+            self.render_dashboard()
+
+    def _update_system_stats(self):
+        """Update system statistics for sidebar display"""
+        import psutil
+        try:
+            self.system_stats = {
+                'cpu_usage': psutil.cpu_percent(),
+                'memory_usage': psutil.virtual_memory().percent,
+                'network_requests': len(self.scan_history),
+                'errors_count': sum(1 for r in self.content_history if 'error' in r.lower())
+            }
+        except ImportError:
+            # Fallback if psutil not available
+            self.system_stats = {
+                'cpu_usage': 0.0,
+                'memory_usage': 0.0,
+                'network_requests': len(self.scan_history),
+                'errors_count': 0
+            }
+
+    def add_content(self, content: str):
+        """Add content to the dashboard main panel"""
+        if content:
+            timestamp = datetime.now().strftime("%H:%M:%S")
+            formatted_content = f"[{timestamp}] {content}"
+            self.content_history.append(formatted_content)
+
+            # Limit history size
+            max_history = 1000
+            if len(self.content_history) > max_history:
+                self.content_history = self.content_history[-max_history:]
+
+    def add_notification(self, notification: str):
+        """Add notification to status bar"""
+        if notification:
+            timestamp = datetime.now().strftime("%H:%M:%S")
+            formatted_notification = f"[{timestamp}] {notification}"
+            self.status_notifications.append(formatted_notification)
+
+            # Limit notifications
+            max_notifications = 50
+            if len(self.status_notifications) > max_notifications:
+                self.status_notifications = self.status_notifications[-max_notifications:]
+
+    def toggle_dashboard(self):
+        """Toggle dashboard mode on/off"""
+        self.dashboard_active = not self.dashboard_active
+        if self.dashboard_active:
+            self.dashboard_renderer.activate()
+            self.add_notification("Dashboard mode activated")
+            self.render_dashboard()
+        else:
+            self.dashboard_renderer.deactivate()
+            self.add_notification("Dashboard mode deactivated")
+            self.clear_screen()
+            print(AsciiArt.main_banner(self.current_target, self.banner_style))
+
+    def apply_theme(self, theme_name: str):
+        """Apply a color theme"""
+        try:
+            from .color_compat import apply_terminal_theme, get_available_themes
+            available_themes = get_available_themes()
+
+            if theme_name in available_themes:
+                apply_terminal_theme(theme_name)
+                self.add_notification(f"Theme changed to: {theme_name}")
+                if self.dashboard_active:
+                    self.render_dashboard()
+                return True
+            else:
+                print(colored(f"Available themes: {', '.join(available_themes)}", 'yellow'))
+                return False
+        except Exception as e:
+            print(colored(f"Theme change failed: {e}", 'red'))
+            return False
+
+    def change_banner_style(self, style: str):
+        """Change banner style"""
+        valid_styles = ['circuit_board', 'security_lock', 'data_stream']
+        if style in valid_styles:
+            self.banner_style = style
+            self.add_notification(f"Banner style changed to: {style}")
+            return True
+        else:
+            print(colored(f"Available styles: {', '.join(valid_styles)}", 'yellow'))
+            return False
+
+    def toggle_animations(self):
+        """Toggle animations on/off"""
+        current_state = self.animation_controller.config.enabled
+        new_state = not current_state
+        self.animation_controller.config.enabled = new_state
+
+        try:
+            from .animation_engine import enable_animations, disable_animations
+            if new_state:
+                enable_animations()
+                self.add_notification("Animations enabled")
+            else:
+                disable_animations()
+                self.add_notification("Animations disabled")
+        except Exception:
+            self.add_notification("Animation toggle failed")
+
+    def recalculate_layout(self):
+        """Force layout recalculation"""
+        self.terminal_detector.refresh_capabilities()
+        if self.dashboard_active:
+            self.render_dashboard()
+        self.add_notification("Layout recalculated")
+
     def _ensure_metrics_file(self):
         """Initialize metrics file if it doesn't exist"""
         try:
