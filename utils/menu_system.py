@@ -760,6 +760,8 @@ class MenuSystem:
                     self.render_dashboard()
                 else:
                     AsciiArt.success_message(success_msg)
+                    # Refresh the simplified interface to show target cleared
+                    self.display_simple_interface()
 
             # Analytics commands
             elif command == 'stats':
