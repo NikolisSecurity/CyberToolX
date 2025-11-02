@@ -10,6 +10,10 @@ from pathlib import Path
 from .color_compat import colored
 from .ascii_art import AsciiArt
 from .command_parser import CommandParser
+from .terminal_utils import TerminalDetector, LayoutEngine
+from .dashboard_renderer import DashboardRenderer
+from .animation_engine import AnimationController
+from .progress_indicators import ProgressIndicator
 
 # Import configuration
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
