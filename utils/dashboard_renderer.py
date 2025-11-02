@@ -284,13 +284,24 @@ class DashboardRenderer:
                     if 0 <= y_pos < len(dashboard_buffer):
                         # Insert line at correct horizontal position
                         x_pos = panel_pos['x'] - 1
+
+                        # Ensure buffer line is long enough
+                        while len(dashboard_buffer[y_pos]) < x_pos:
+                            dashboard_buffer[y_pos] += ' '
+
+                        # Handle panel merging properly
                         if x_pos == 0:
+                            # Panel starts at beginning, replace entire line
                             dashboard_buffer[y_pos] = line
                         else:
-                            # Ensure buffer line is long enough
-                            while len(dashboard_buffer[y_pos]) < x_pos:
-                                dashboard_buffer[y_pos] += ' '
-                            dashboard_buffer[y_pos] = dashboard_buffer[y_pos][:x_pos] + line
+                            # Panel is positioned after existing content
+                            buffer_line = dashboard_buffer[y_pos]
+                            if len(buffer_line) >= x_pos:
+                                # Overwrite existing content at this position
+                                dashboard_buffer[y_pos] = buffer_line[:x_pos] + line
+                            else:
+                                # Append to buffer line (shouldn't happen with proper layout)
+                                dashboard_buffer[y_pos] = buffer_line + ' ' * (x_pos - len(buffer_line)) + line
 
         # Clear screen and render dashboard
         sys.stdout.write('\033[2J\033[H')  # Clear screen and move cursor to top
