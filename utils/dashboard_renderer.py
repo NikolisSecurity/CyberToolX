@@ -263,8 +263,8 @@ class DashboardRenderer:
         positions = self.layout_engine.position_elements()
         terminal_width, terminal_height = self.layout_engine.detector.get_terminal_size()
 
-        # Create a buffer for the entire dashboard
-        dashboard_buffer = [''] * terminal_height
+        # Create a buffer for the entire dashboard with proper line lengths
+        dashboard_buffer = [' ' * terminal_width for _ in range(terminal_height)]
 
         # Render each panel and place it in the buffer
         panels_to_render = [
