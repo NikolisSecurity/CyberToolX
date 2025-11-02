@@ -45,16 +45,27 @@ try:
 except ImportError:
     HAS_TERMCOLOR = False
 
-    # ANSI color codes fallback (bright colors for neon effect)
+    # Enhanced ANSI color codes fallback (bright colors for neon effect)
     COLORS = {
+        # Original colors
         'red': '\033[91m',      # Bright red (neon red)
         'green': '\033[92m',    # Bright green (neon green)
         'yellow': '\033[93m',   # Bright yellow (neon orange)
         'blue': '\033[95m',     # Bright magenta (lighter pink-red)
         'magenta': '\033[95m',  # Bright magenta (lighter pink-red)
-        'cyan': '\033[91m',     # Map cyan to bright red (neon red)
+        'cyan': '\033[96m',     # Bright cyan
         'white': '\033[97m',    # Bright white
         'grey': '\033[97m',     # Map grey to bright white
+
+        # New accent colors with ANSI codes
+        'tech_cyan': '\033[96m',      # Bright cyan for tech elements
+        'cyber_purple': '\033[95m',   # Bright magenta for cyber symbols
+        'bright_white': '\033[97m',   # Bright white for highlights
+        'enhanced_green': '\033[92m', # Bright green for success
+        'electric_blue': '\033[94m',  # Bright blue for network
+        'neon_pink': '\033[95m',      # Bright magenta for highlights
+        'acid_green': '\033[92m',     # Bright green for alerts
+        'deep_purple': '\033[35m',    # Standard magenta for backgrounds
     }
 
     ATTRS = {
