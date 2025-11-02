@@ -522,14 +522,22 @@ class MenuSystem:
         input()
 
     def run(self):
-        """Main menu loop"""
+        """Main menu loop with enhanced dashboard integration"""
         # Show loading screen
         self.clear_screen()
         AsciiArt.loading_screen()
         self.clear_screen()
 
-        # Show main banner
-        print(AsciiArt.main_banner(self.current_target))
+        # Initialize dashboard and show initial interface
+        if self.dashboard_active:
+            self.render_dashboard()
+        else:
+            # Show main banner with enhanced styling
+            terminal_width = self.terminal_detector.get_terminal_size()[0]
+            if terminal_width >= 70:
+                print(AsciiArt.multi_panel_banner(self.current_target, terminal_width))
+            else:
+                print(AsciiArt.main_banner(self.current_target, self.banner_style))
 
         # Welcome message with username
         try:
@@ -537,9 +545,14 @@ class MenuSystem:
         except Exception:
             username = "User"
 
-        print(colored(f"Hello @{username}. Welcome to NPS Tool", 'cyan'))
-        print(colored("To view the list of commands, type help", 'cyan'))
-        print()
+        welcome_msg = f"Hello @{username}. Welcome to NPS Tool - Enhanced Interface"
+        self.add_content(welcome_msg)
+        self.add_notification("System initialized successfully")
+
+        if not self.dashboard_active:
+            print(colored(welcome_msg, 'cyan'))
+            print(colored("Type 'help' for commands or 'dashboard' to enable enhanced mode", 'cyan'))
+            print()
 
         while self.running:
             try:
@@ -553,16 +566,33 @@ class MenuSystem:
                 if command is None:
                     continue
 
+                # Log command to content history
+                self.add_content(f"Command executed: {user_input}")
+
                 # Execute command
                 self.execute_command(command, args)
 
+                # Update dashboard if active
+                if self.dashboard_active:
+                    self.render_dashboard()
+
             except KeyboardInterrupt:
-                print(f"\n\n{colored('Use', 'yellow')} {colored('exit', 'green', attrs=['bold'])} {colored('to quit', 'yellow')}\n")
+                self.add_content("Keyboard interrupt detected")
+                if self.dashboard_active:
+                    self.render_dashboard()
+                else:
+                    print(f"\n\n{colored('Use', 'yellow')} {colored('exit', 'green', attrs=['bold'])} {colored('to quit', 'yellow')}\n")
                 continue
             except EOFError:
                 break
             except Exception as e:
-                print(f"\n{colored('✗ Error:', 'red', attrs=['bold'])} {str(e)}\n")
+                error_msg = f"Error: {str(e)}"
+                self.add_content(error_msg)
+                self.add_notification(error_msg)
+                if self.dashboard_active:
+                    self.render_dashboard()
+                else:
+                    print(f"\n{colored('✗ Error:', 'red', attrs=['bold'])} {str(e)}\n")
 
     def execute_command(self, command, args):
         """Execute a parsed command"""
