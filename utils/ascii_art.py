@@ -4,7 +4,11 @@ from .color_compat import colored
 import time
 import sys
 import random
-import requests
+try:
+    import requests
+    HAS_REQUESTS = True
+except ImportError:
+    HAS_REQUESTS = False
 import getpass
 
 
