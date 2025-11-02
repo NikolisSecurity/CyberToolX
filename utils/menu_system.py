@@ -595,6 +595,7 @@ class MenuSystem:
 
         if not self.dashboard_active:
             # Already displayed in display_simple_interface, no need to repeat
+            pass
 
         while self.running:
             try:
