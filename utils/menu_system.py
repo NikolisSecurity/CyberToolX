@@ -731,6 +731,8 @@ class MenuSystem:
                         self.render_dashboard()
                     else:
                         AsciiArt.success_message(success_msg)
+                        # Refresh the simplified interface to show new target
+                        self.display_simple_interface()
                 else:
                     error_msg = "Usage: target <ip/domain>"
                     self.add_content(error_msg)
