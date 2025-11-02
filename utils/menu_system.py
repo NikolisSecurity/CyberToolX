@@ -413,6 +413,7 @@ class MenuSystem:
             target_display = self.current_target or "No Target"
             return colored(f'cyber@nps [{target_display}] > ', 'tech_cyan')
         else:
+            # Simple prompt for the new simplified interface
             return colored('[>] ', 'green')
 
     def display_help(self, category=None):
