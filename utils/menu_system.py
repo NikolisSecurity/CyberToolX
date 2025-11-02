@@ -147,8 +147,8 @@ class MenuSystem:
         # Set current banner style
         self.banner_style = 'circuit_board'
 
-        # Initialize dashboard
-        self._initialize_dashboard()
+        # Initialize dashboard (disabled by default)
+        # self._initialize_dashboard()  # Commented out to use simplified interface
 
     def clear_screen(self):
         """Clear terminal screen"""
