@@ -10,6 +10,10 @@ from pathlib import Path
 from .color_compat import colored
 from .ascii_art import AsciiArt
 from .command_parser import CommandParser
+from .terminal_utils import TerminalDetector, LayoutEngine
+from .dashboard_renderer import DashboardRenderer
+from .animation_engine import AnimationController
+from .progress_indicators import ProgressIndicator
 
 # Import configuration
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -17,7 +21,7 @@ from config import CONFIG, DEFAULTS
 
 
 class MenuSystem:
-    """Interactive menu-driven interface"""
+    """Interactive menu-driven interface with enhanced dashboard"""
 
     def __init__(self):
         self.running = True
@@ -41,6 +45,19 @@ class MenuSystem:
         self.metrics_file = Path(__file__).parent.parent / 'data' / 'command_metrics.json'
         self._ensure_metrics_file()
 
+        # Enhanced dashboard components
+        self.terminal_detector = TerminalDetector()
+        self.layout_engine = LayoutEngine(self.terminal_detector)
+        self.dashboard_renderer = DashboardRenderer(self.layout_engine)
+        self.animation_controller = AnimationController()
+        self.progress_indicator = ProgressIndicator(self.animation_controller)
+
+        # Dashboard state
+        self.dashboard_active = False
+        self.content_history = []
+        self.status_notifications = []
+        self.system_stats = {}
+
         # Define all available commands
         self.commands = {
             # Main Menu
@@ -50,6 +67,7 @@ class MenuSystem:
             'quit': 'Exit NPS Tool',
             'banner': 'Display the main banner',
             'about': 'About NPS Tool',
+            'dashboard': 'Toggle enhanced dashboard mode',
 
             # Target Management
             'target': 'Set target for scanning (usage: target <ip/domain>)',
@@ -106,14 +124,189 @@ class MenuSystem:
             'stats': 'Display command usage statistics',
             'timeline': 'Show command usage timeline',
             'performance': 'Show command performance metrics',
-            'exportstats': 'Export analytics to report file'
+            'exportstats': 'Export analytics to report file',
+
+            # Enhanced Interface Commands
+            'theme': 'Change color theme (usage: theme <name>)',
+            'style': 'Change banner style (usage: style <circuit|security|data>)',
+            'animate': 'Toggle animations on/off',
+            'layout': 'Force layout recalculation'
         }
 
         self.parser = CommandParser(self.commands)
 
+        # Set current banner style
+        self.banner_style = 'circuit_board'
+
+        # Initialize dashboard
+        self._initialize_dashboard()
+
     def clear_screen(self):
         """Clear terminal screen"""
         os.system('clear' if os.name != 'nt' else 'cls')
+
+    def _initialize_dashboard(self):
+        """Initialize the dashboard system"""
+        try:
+            self.dashboard_renderer.activate()
+            self.dashboard_active = True
+            self._update_system_stats()
+        except Exception as e:
+            print(colored(f"Warning: Dashboard initialization failed: {e}", 'yellow'))
+            self.dashboard_active = False
+
+    def detect_terminal_size(self):
+        """Detect terminal size and determine optimal layout preset"""
+        return self.terminal_detector.determine_preset()
+
+    def render_dashboard(self):
+        """Render the multi-panel dashboard interface"""
+        if not self.dashboard_active:
+            return
+
+        try:
+            # Update system stats
+            self._update_system_stats()
+
+            # Prepare content for dashboard
+            terminal_info = self.terminal_detector.get_capabilities()
+            sidebar_stats = {
+                'Terminal': f"{terminal_info['size'][0]}x{terminal_info['size'][1]}",
+                'Preset': terminal_info['preset'].value,
+                'Unicode': 'Yes' if terminal_info['unicode'] else 'No',
+                'Colors': terminal_info['color_level'],
+                'Target': self.current_target or 'Not Set',
+                'Commands': len(self.content_history)
+            }
+
+            # Get recent content for main panel
+            recent_content = self.content_history[-20:] if self.content_history else ["Welcome to NPS Tool", "Type 'help' for available commands"]
+
+            # Render dashboard
+            self.dashboard_renderer.refresh_dashboard(
+                header_title="NPS TOOL",
+                sidebar_target=self.current_target or "Not Set",
+                sidebar_stats=sidebar_stats,
+                main_content=recent_content,
+                status_notifications=self.status_notifications[-5:] if self.status_notifications else None
+            )
+        except Exception as e:
+            print(colored(f"Dashboard render error: {e}", 'red'))
+
+    def update_panels(self):
+        """Update specific dashboard sections"""
+        if self.dashboard_active:
+            self.render_dashboard()
+
+    def _update_system_stats(self):
+        """Update system statistics for sidebar display"""
+        import psutil
+        try:
+            self.system_stats = {
+                'cpu_usage': psutil.cpu_percent(),
+                'memory_usage': psutil.virtual_memory().percent,
+                'network_requests': len(self.scan_history),
+                'errors_count': sum(1 for r in self.content_history if 'error' in r.lower())
+            }
+        except ImportError:
+            # Fallback if psutil not available
+            self.system_stats = {
+                'cpu_usage': 0.0,
+                'memory_usage': 0.0,
+                'network_requests': len(self.scan_history),
+                'errors_count': 0
+            }
+
+    def add_content(self, content: str):
+        """Add content to the dashboard main panel"""
+        if content:
+            timestamp = datetime.now().strftime("%H:%M:%S")
+            formatted_content = f"[{timestamp}] {content}"
+            self.content_history.append(formatted_content)
+
+            # Limit history size
+            max_history = 1000
+            if len(self.content_history) > max_history:
+                self.content_history = self.content_history[-max_history:]
+
+    def add_notification(self, notification: str):
+        """Add notification to status bar"""
+        if notification:
+            timestamp = datetime.now().strftime("%H:%M:%S")
+            formatted_notification = f"[{timestamp}] {notification}"
+            self.status_notifications.append(formatted_notification)
+
+            # Limit notifications
+            max_notifications = 50
+            if len(self.status_notifications) > max_notifications:
+                self.status_notifications = self.status_notifications[-max_notifications:]
+
+    def toggle_dashboard(self):
+        """Toggle dashboard mode on/off"""
+        self.dashboard_active = not self.dashboard_active
+        if self.dashboard_active:
+            self.dashboard_renderer.activate()
+            self.add_notification("Dashboard mode activated")
+            self.render_dashboard()
+        else:
+            self.dashboard_renderer.deactivate()
+            self.add_notification("Dashboard mode deactivated")
+            self.clear_screen()
+            print(AsciiArt.main_banner(self.current_target, self.banner_style))
+
+    def apply_theme(self, theme_name: str):
+        """Apply a color theme"""
+        try:
+            from .color_compat import apply_terminal_theme, get_available_themes
+            available_themes = get_available_themes()
+
+            if theme_name in available_themes:
+                apply_terminal_theme(theme_name)
+                self.add_notification(f"Theme changed to: {theme_name}")
+                if self.dashboard_active:
+                    self.render_dashboard()
+                return True
+            else:
+                print(colored(f"Available themes: {', '.join(available_themes)}", 'yellow'))
+                return False
+        except Exception as e:
+            print(colored(f"Theme change failed: {e}", 'red'))
+            return False
+
+    def change_banner_style(self, style: str):
+        """Change banner style"""
+        valid_styles = ['circuit_board', 'security_lock', 'data_stream']
+        if style in valid_styles:
+            self.banner_style = style
+            self.add_notification(f"Banner style changed to: {style}")
+            return True
+        else:
+            print(colored(f"Available styles: {', '.join(valid_styles)}", 'yellow'))
+            return False
+
+    def toggle_animations(self):
+        """Toggle animations on/off"""
+        current_state = self.animation_controller.config.enabled
+        new_state = not current_state
+        self.animation_controller.config.enabled = new_state
+
+        try:
+            from .animation_engine import enable_animations, disable_animations
+            if new_state:
+                enable_animations()
+                self.add_notification("Animations enabled")
+            else:
+                disable_animations()
+                self.add_notification("Animations disabled")
+        except Exception:
+            self.add_notification("Animation toggle failed")
+
+    def recalculate_layout(self):
+        """Force layout recalculation"""
+        self.terminal_detector.refresh_capabilities()
+        if self.dashboard_active:
+            self.render_dashboard()
+        self.add_notification("Layout recalculated")
 
     def _ensure_metrics_file(self):
         """Initialize metrics file if it doesn't exist"""
@@ -201,16 +394,69 @@ class MenuSystem:
             pass
 
     def display_prompt(self):
-        """Display command prompt"""
-        return colored('[>] ', 'green')
+        """Display command prompt with dashboard integration"""
+        if self.dashboard_active:
+            # Show prompt in dashboard context
+            target_display = self.current_target or "No Target"
+            return colored(f'cyber@nps [{target_display}] > ', 'tech_cyan')
+        else:
+            return colored('[>] ', 'green')
 
     def display_help(self, category=None):
-        """Display help information"""
+        """Display help information using dashboard panels"""
+        if self.dashboard_active:
+            self._display_help_dashboard(category)
+        else:
+            self._display_help_traditional(category)
+
+    def _display_help_dashboard(self, category=None):
+        """Display help using dashboard panels"""
+        help_content = []
+        help_content.append(colored("╔═══════════════════════ COMMAND REFERENCE ═══════════════════════╗", 'cyan', attrs=['bold']))
+        help_content.append("")
+
+        categories = {
+            'Main': ['help', 'clear', 'exit', 'quit', 'banner', 'about', 'dashboard'],
+            'Interface': ['theme', 'style', 'animate', 'layout'],
+            'Target Management': ['target', 'showtarget', 'cleartarget'],
+            'Web Testing': ['webscan', 'dirscan', 'sqlmap', 'xsstest', 'csrftest', 'headerscan', 'sslscan', 'wafscan', 'cmsscan', 'apiscan', 'graphql', 'jwtscan', 'robots'],
+            'DNS & Subdomain': ['dnsenum', 'subdomain'],
+            'Web OSINT': ['emailharvest', 'metadata', 'techstack'],
+            'Reporting': ['results', 'report', 'export', 'history', 'compare'],
+            'Configuration': ['settings', 'proxy', 'threads', 'timeout', 'verbose', 'update'],
+            'Analytics': ['stats', 'timeline', 'performance', 'exportstats'],
+            'Advanced': ['script', 'schedule', 'monitor', 'honeypot', 'custom']
+        }
+
+        if category and category in categories:
+            # Show specific category
+            help_content.append(colored(f"  {category} Commands:", 'yellow', attrs=['bold']))
+            for cmd in categories[category]:
+                desc = self.commands.get(cmd, 'No description')
+                help_content.append(f"    {colored(cmd, 'green'):<20} - {colored(desc, 'white')}")
+        else:
+            # Show all categories
+            for cat_name, cmd_list in categories.items():
+                help_content.append(colored(f"  {cat_name}:", 'yellow', attrs=['bold']))
+                for cmd in cmd_list:
+                    desc = self.commands.get(cmd, 'No description')
+                    help_content.append(f"    {colored(cmd, 'green'):<20} - {colored(desc, 'white')}")
+                help_content.append("")
+
+        help_content.append(colored("╚════════════════════════════════════════════════════════════════╝", 'cyan', attrs=['bold']))
+
+        # Add to content history
+        self.content_history.extend(help_content)
+        self.render_dashboard()
+
+    def _display_help_traditional(self, category=None):
+        """Traditional help display for non-dashboard mode"""
         self.clear_screen()
         print(colored("\n╔═══════════════════════ COMMAND REFERENCE ═══════════════════════╗\n", 'cyan', attrs=['bold']))
 
         categories = {
-            'Main': ['help', 'clear', 'exit', 'quit', 'banner', 'about'],
+            'Main': ['help', 'clear', 'exit', 'quit', 'banner', 'about', 'dashboard'],
+            'Interface': ['theme', 'style', 'animate', 'layout'],
             'Target Management': ['target', 'showtarget', 'cleartarget'],
             'Web Testing': ['webscan', 'dirscan', 'sqlmap', 'xsstest', 'csrftest', 'headerscan', 'sslscan', 'wafscan', 'cmsscan', 'apiscan', 'graphql', 'jwtscan', 'robots'],
             'DNS & Subdomain': ['dnsenum', 'subdomain'],
@@ -276,14 +522,22 @@ class MenuSystem:
         input()
 
     def run(self):
-        """Main menu loop"""
+        """Main menu loop with enhanced dashboard integration"""
         # Show loading screen
         self.clear_screen()
         AsciiArt.loading_screen()
         self.clear_screen()
 
-        # Show main banner
-        print(AsciiArt.main_banner(self.current_target))
+        # Initialize dashboard and show initial interface
+        if self.dashboard_active:
+            self.render_dashboard()
+        else:
+            # Show main banner with enhanced styling
+            terminal_width = self.terminal_detector.get_terminal_size()[0]
+            if terminal_width >= 70:
+                print(AsciiArt.multi_panel_banner(self.current_target, terminal_width))
+            else:
+                print(AsciiArt.main_banner(self.current_target, self.banner_style))
 
         # Welcome message with username
         try:
@@ -291,9 +545,14 @@ class MenuSystem:
         except Exception:
             username = "User"
 
-        print(colored(f"Hello @{username}. Welcome to NPS Tool", 'cyan'))
-        print(colored("To view the list of commands, type help", 'cyan'))
-        print()
+        welcome_msg = f"Hello @{username}. Welcome to NPS Tool - Enhanced Interface"
+        self.add_content(welcome_msg)
+        self.add_notification("System initialized successfully")
+
+        if not self.dashboard_active:
+            print(colored(welcome_msg, 'cyan'))
+            print(colored("Type 'help' for commands or 'dashboard' to enable enhanced mode", 'cyan'))
+            print()
 
         while self.running:
             try:
@@ -307,16 +566,33 @@ class MenuSystem:
                 if command is None:
                     continue
 
+                # Log command to content history
+                self.add_content(f"Command executed: {user_input}")
+
                 # Execute command
                 self.execute_command(command, args)
 
+                # Update dashboard if active
+                if self.dashboard_active:
+                    self.render_dashboard()
+
             except KeyboardInterrupt:
-                print(f"\n\n{colored('Use', 'yellow')} {colored('exit', 'green', attrs=['bold'])} {colored('to quit', 'yellow')}\n")
+                self.add_content("Keyboard interrupt detected")
+                if self.dashboard_active:
+                    self.render_dashboard()
+                else:
+                    print(f"\n\n{colored('Use', 'yellow')} {colored('exit', 'green', attrs=['bold'])} {colored('to quit', 'yellow')}\n")
                 continue
             except EOFError:
                 break
             except Exception as e:
-                print(f"\n{colored('✗ Error:', 'red', attrs=['bold'])} {str(e)}\n")
+                error_msg = f"Error: {str(e)}"
+                self.add_content(error_msg)
+                self.add_notification(error_msg)
+                if self.dashboard_active:
+                    self.render_dashboard()
+                else:
+                    print(f"\n{colored('✗ Error:', 'red', attrs=['bold'])} {str(e)}\n")
 
     def execute_command(self, command, args):
         """Execute a parsed command"""
@@ -330,33 +606,116 @@ class MenuSystem:
             if command == 'help':
                 self.display_help()
             elif command == 'clear':
-                self.clear_screen()
-                print(AsciiArt.main_banner(self.current_target))
+                if self.dashboard_active:
+                    self.content_history.clear()
+                    self.render_dashboard()
+                else:
+                    self.clear_screen()
+                    print(AsciiArt.main_banner(self.current_target, self.banner_style))
             elif command in ['exit', 'quit']:
                 self.running = False
+                self.add_content("NPS Tool shutting down...")
+                if self.dashboard_active:
+                    self.dashboard_renderer.deactivate()
                 print(f"\n{colored('Shutting down NPS Tool...', 'cyan')}")
                 print(colored('Stay safe. Stay ethical. 👾\n', 'green'))
             elif command == 'banner':
-                self.clear_screen()
-                print(AsciiArt.main_banner(self.current_target))
+                if self.dashboard_active:
+                    self.add_notification("Banner displayed")
+                    self.render_dashboard()
+                else:
+                    self.clear_screen()
+                    terminal_width = self.terminal_detector.get_terminal_size()[0]
+                    if terminal_width >= 70:
+                        print(AsciiArt.multi_panel_banner(self.current_target, terminal_width))
+                    else:
+                        print(AsciiArt.main_banner(self.current_target, self.banner_style))
             elif command == 'about':
                 self.display_about()
+            elif command == 'dashboard':
+                self.toggle_dashboard()
+
+            # Enhanced interface commands
+            elif command == 'theme':
+                if args:
+                    theme_name = args[0].lower()
+                    success = self.apply_theme(theme_name)
+                    if not self.dashboard_active:
+                        if success:
+                            print(colored(f"Theme changed to: {theme_name}", 'green'))
+                        else:
+                            print(colored(f"Failed to change theme: {theme_name}", 'red'))
+                else:
+                    # Show available themes
+                    try:
+                        from .color_compat import get_available_themes, get_current_theme
+                        available = get_available_themes()
+                        current = get_current_theme()
+                        print(colored(f"Current theme: {current}", 'cyan'))
+                        print(colored(f"Available themes: {', '.join(available)}", 'yellow'))
+                    except Exception as e:
+                        print(colored(f"Theme system error: {e}", 'red'))
+            elif command == 'style':
+                if args:
+                    style_name = args[0].lower()
+                    success = self.change_banner_style(style_name)
+                    if not self.dashboard_active:
+                        if success:
+                            print(colored(f"Banner style changed to: {style_name}", 'green'))
+                        else:
+                            print(colored(f"Failed to change style: {style_name}", 'red'))
+                else:
+                    print(colored(f"Current style: {self.banner_style}", 'cyan'))
+                    print(colored("Available styles: circuit_board, security_lock, data_stream", 'yellow'))
+            elif command == 'animate':
+                self.toggle_animations()
+                if not self.dashboard_active:
+                    state = "enabled" if self.animation_controller.config.enabled else "disabled"
+                    print(colored(f"Animations {state}", 'green'))
+            elif command == 'layout':
+                self.recalculate_layout()
+                if not self.dashboard_active:
+                    preset = self.detect_terminal_size()
+                    print(colored(f"Layout recalculated. Terminal preset: {preset.value}", 'green'))
 
             # Target management
             elif command == 'target':
                 if args:
                     self.current_target = args[0]
-                    AsciiArt.success_message(f"Target set to: {self.current_target}")
+                    success_msg = f"Target set to: {self.current_target}"
+                    self.add_content(success_msg)
+                    self.add_notification(f"Target changed: {self.current_target}")
+                    if self.dashboard_active:
+                        self.render_dashboard()
+                    else:
+                        AsciiArt.success_message(success_msg)
                 else:
-                    AsciiArt.error_message("Usage: target <ip/domain>")
+                    error_msg = "Usage: target <ip/domain>"
+                    self.add_content(error_msg)
+                    if not self.dashboard_active:
+                        AsciiArt.error_message(error_msg)
             elif command == 'showtarget':
                 if self.current_target:
-                    print(f"\n{colored('Current target:', 'cyan')} {colored(self.current_target, 'green', attrs=['bold'])}\n")
+                    target_msg = f"Current target: {self.current_target}"
+                    self.add_content(target_msg)
+                    if self.dashboard_active:
+                        self.render_dashboard()
+                    else:
+                        print(f"\n{colored('Current target:', 'cyan')} {colored(self.current_target, 'green', attrs=['bold'])}\n")
                 else:
-                    AsciiArt.warning_message("No target set. Use 'target <ip/domain>' to set one.")
+                    warning_msg = "No target set. Use 'target <ip/domain>' to set one."
+                    self.add_content(warning_msg)
+                    if not self.dashboard_active:
+                        AsciiArt.warning_message(warning_msg)
             elif command == 'cleartarget':
                 self.current_target = None
-                AsciiArt.success_message("Target cleared")
+                success_msg = "Target cleared"
+                self.add_content(success_msg)
+                self.add_notification("Target cleared")
+                if self.dashboard_active:
+                    self.render_dashboard()
+                else:
+                    AsciiArt.success_message(success_msg)
 
             # Analytics commands
             elif command == 'stats':
