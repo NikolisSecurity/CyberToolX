@@ -606,17 +606,77 @@ class MenuSystem:
             if command == 'help':
                 self.display_help()
             elif command == 'clear':
-                self.clear_screen()
-                print(AsciiArt.main_banner(self.current_target))
+                if self.dashboard_active:
+                    self.content_history.clear()
+                    self.render_dashboard()
+                else:
+                    self.clear_screen()
+                    print(AsciiArt.main_banner(self.current_target, self.banner_style))
             elif command in ['exit', 'quit']:
                 self.running = False
+                self.add_content("NPS Tool shutting down...")
+                if self.dashboard_active:
+                    self.dashboard_renderer.deactivate()
                 print(f"\n{colored('Shutting down NPS Tool...', 'cyan')}")
                 print(colored('Stay safe. Stay ethical. 👾\n', 'green'))
             elif command == 'banner':
-                self.clear_screen()
-                print(AsciiArt.main_banner(self.current_target))
+                if self.dashboard_active:
+                    self.add_notification("Banner displayed")
+                    self.render_dashboard()
+                else:
+                    self.clear_screen()
+                    terminal_width = self.terminal_detector.get_terminal_size()[0]
+                    if terminal_width >= 70:
+                        print(AsciiArt.multi_panel_banner(self.current_target, terminal_width))
+                    else:
+                        print(AsciiArt.main_banner(self.current_target, self.banner_style))
             elif command == 'about':
                 self.display_about()
+            elif command == 'dashboard':
+                self.toggle_dashboard()
+
+            # Enhanced interface commands
+            elif command == 'theme':
+                if args:
+                    theme_name = args[0].lower()
+                    success = self.apply_theme(theme_name)
+                    if not self.dashboard_active:
+                        if success:
+                            print(colored(f"Theme changed to: {theme_name}", 'green'))
+                        else:
+                            print(colored(f"Failed to change theme: {theme_name}", 'red'))
+                else:
+                    # Show available themes
+                    try:
+                        from .color_compat import get_available_themes, get_current_theme
+                        available = get_available_themes()
+                        current = get_current_theme()
+                        print(colored(f"Current theme: {current}", 'cyan'))
+                        print(colored(f"Available themes: {', '.join(available)}", 'yellow'))
+                    except Exception as e:
+                        print(colored(f"Theme system error: {e}", 'red'))
+            elif command == 'style':
+                if args:
+                    style_name = args[0].lower()
+                    success = self.change_banner_style(style_name)
+                    if not self.dashboard_active:
+                        if success:
+                            print(colored(f"Banner style changed to: {style_name}", 'green'))
+                        else:
+                            print(colored(f"Failed to change style: {style_name}", 'red'))
+                else:
+                    print(colored(f"Current style: {self.banner_style}", 'cyan'))
+                    print(colored("Available styles: circuit_board, security_lock, data_stream", 'yellow'))
+            elif command == 'animate':
+                self.toggle_animations()
+                if not self.dashboard_active:
+                    state = "enabled" if self.animation_controller.config.enabled else "disabled"
+                    print(colored(f"Animations {state}", 'green'))
+            elif command == 'layout':
+                self.recalculate_layout()
+                if not self.dashboard_active:
+                    preset = self.detect_terminal_size()
+                    print(colored(f"Layout recalculated. Terminal preset: {preset.value}", 'green'))
 
             # Target management
             elif command == 'target':
