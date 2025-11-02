@@ -18,6 +18,8 @@ class AsciiArt:
     @staticmethod
     def get_public_ip():
         """Fetch public IP address from ipify.org API"""
+        if not HAS_REQUESTS:
+            return "Unavailable (no requests module)"
         try:
             response = requests.get('https://api.ipify.org?format=json', timeout=3)
             return response.json()['ip']
