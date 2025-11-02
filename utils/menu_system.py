@@ -545,27 +545,27 @@ class MenuSystem:
             username = "User"
 
         # Account Information Panel
-        print("╒═════════════════════╕")
-        print("│ Account Information │")
+        print(colored("╒═════════════════════╕", 'red'))
+        print(colored("│ Account Information │", 'red'))
         if self.current_target:
-            print(f"│ Target: {self.current_target.ljust(14)} │")
+            print(colored(f"│ Target: {self.current_target.ljust(14)} │", 'red'))
         else:
-            print("│ Target: Not Set     │")
-        print("│ IP: 203.0.113.45    │")
-        print("╘═════════════════════╛")
+            print(colored("│ Target: Not Set     │", 'red'))
+        print(colored("│ IP: 203.0.113.45    │", 'red'))
+        print(colored("╘═════════════════════╛", 'red'))
         print()
 
         # Header
-        print("══╦═════════════════════════════════════╦══")
-        print("╔════════════════════════════════════════╗")
-        print("│  NPS Tool                              │")
-        print("│  Advanced Web Security Testing         │")
-        print("╚════════════════════════════════════════╝")
+        print(colored("══╦═════════════════════════════════════╦══", 'blue'))
+        print(colored("╔════════════════════════════════════════╗", 'blue'))
+        print(colored("│  NPS Tool                              │", 'blue'))
+        print(colored("│  Advanced Web Security Testing         │", 'blue'))
+        print(colored("╚════════════════════════════════════════╝", 'blue'))
         print()
 
         # Welcome message
-        print(f"Hello @{username}. Welcome to NPS Tool")
-        print("To view the list of commands, type help")
+        print(colored(f"Hello @{username}. Welcome to NPS Tool", 'cyan'))
+        print(colored("To view the list of commands, type help", 'white'))
         print()
 
     def run(self):
