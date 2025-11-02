@@ -305,9 +305,11 @@ class DashboardRenderer:
 
         # Clear screen and render dashboard
         sys.stdout.write('\033[2J\033[H')  # Clear screen and move cursor to top
+
+        # Render all lines, including empty ones for proper spacing
         for line in dashboard_buffer:
-            if line.strip():  # Only print non-empty lines
-                sys.stdout.write(line + '\n')
+            # Ensure all lines are printed to maintain layout integrity
+            sys.stdout.write(line + '\n')
         sys.stdout.flush()
 
         self.last_render = {
