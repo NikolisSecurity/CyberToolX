@@ -547,9 +547,10 @@ class MenuSystem:
         # Account Information Panel
         print("╒═════════════════════╕")
         print("│ Account Information │")
-        print("│ Target: Not Set     │")
         if self.current_target:
             print(f"│ Target: {self.current_target.ljust(14)} │")
+        else:
+            print("│ Target: Not Set     │")
         print("│ IP: 203.0.113.45    │")
         print("╘═════════════════════╛")
         print()
