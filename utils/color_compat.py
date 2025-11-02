@@ -4,9 +4,10 @@ try:
     from termcolor import colored as _termcolor_colored
     HAS_TERMCOLOR = True
 
-    # Neon cyberpunk color mapping for termcolor
-    # Maps standard color names to neon theme equivalents
+    # Enhanced neon cyberpunk color mapping for termcolor
+    # Maps standard color names to neon theme equivalents with new accent colors
     COLOR_MAP = {
+        # Original mappings
         'cyan': 'red',      # cyan → neon red (#ff0055)
         'red': 'red',       # red → neon red (#ff0055)
         'green': 'green',   # green → neon green (#00ff88)
@@ -15,6 +16,16 @@ try:
         'magenta': 'magenta',  # magenta → lighter pink-red
         'white': 'white',   # white stays white
         'grey': 'white',    # grey → white for better visibility
+
+        # New accent color mappings
+        'tech_cyan': 'cyan',       # Tech cyan for data streams
+        'cyber_purple': 'magenta', # Cyber purple for special effects
+        'bright_white': 'white',   # Bright white for highlights
+        'enhanced_green': 'green', # Enhanced green for success states
+        'electric_blue': 'blue',   # Electric blue for network connections
+        'neon_pink': 'magenta',    # Neon pink for special highlights
+        'acid_green': 'green',     # Acid green for alerts
+        'deep_purple': 'magenta',  # Deep purple for background elements
     }
 
     def colored(text, color=None, on_color=None, attrs=None):
