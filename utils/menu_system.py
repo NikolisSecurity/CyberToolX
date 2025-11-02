@@ -534,6 +534,39 @@ class MenuSystem:
         print(about_text)
         input()
 
+    def display_simple_interface(self):
+        """Display the simplified ASCII interface"""
+        self.clear_screen()
+
+        # Get username for display
+        try:
+            username = getpass.getuser()
+        except Exception:
+            username = "User"
+
+        # Account Information Panel
+        print("╒═════════════════════╕")
+        print("│ Account Information │")
+        print("│ Target: Not Set     │")
+        if self.current_target:
+            print(f"│ Target: {self.current_target.ljust(14)} │")
+        print("│ IP: 203.0.113.45    │")
+        print("╘═════════════════════╛")
+        print()
+
+        # Header
+        print("══╦═════════════════════════════════════╦══")
+        print("╔════════════════════════════════════════╗")
+        print("│  NPS Tool                              │")
+        print("│  Advanced Web Security Testing         │")
+        print("╚════════════════════════════════════════╝")
+        print()
+
+        # Welcome message
+        print(f"Hello @{username}. Welcome to NPS Tool")
+        print("To view the list of commands, type help")
+        print()
+
     def run(self):
         """Main menu loop with enhanced dashboard integration"""
         # Show loading screen
@@ -545,12 +578,8 @@ class MenuSystem:
         if self.dashboard_active:
             self.render_dashboard()
         else:
-            # Show main banner with enhanced styling
-            terminal_width = self.terminal_detector.get_terminal_size()[0]
-            if terminal_width >= 70:
-                print(AsciiArt.multi_panel_banner(self.current_target, terminal_width))
-            else:
-                print(AsciiArt.main_banner(self.current_target, self.banner_style))
+            # Show simplified interface
+            self.display_simple_interface()
 
         # Welcome message with username
         try:
@@ -563,9 +592,7 @@ class MenuSystem:
         self.add_notification("System initialized successfully")
 
         if not self.dashboard_active:
-            print(colored(welcome_msg, 'cyan'))
-            print(colored("Type 'help' for commands or 'dashboard' to enable enhanced mode", 'cyan'))
-            print()
+            # Already displayed in display_simple_interface, no need to repeat
 
         while self.running:
             try:
