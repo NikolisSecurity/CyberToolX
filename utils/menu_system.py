@@ -111,7 +111,10 @@ class MenuSystem:
             'threads': 'Set thread count',
             'timeout': 'Set connection timeout',
             'verbose': 'Toggle verbose output',
-            'update': 'Update tool databases',
+            'update': 'Update tool and databases (interactive menu)',
+            'update tool': 'Update CyberToolX from GitHub repository',
+            'update databases': 'Update wordlists and security databases',
+            'check-updates': 'Check for available updates',
 
             # Advanced
             'script': 'Run automation script',
