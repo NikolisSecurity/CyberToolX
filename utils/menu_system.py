@@ -403,12 +403,60 @@ class MenuSystem:
             return colored('[>] ', 'green')
 
     def display_help(self, category=None):
-        """Display help information"""
+        """Display help information using dashboard panels"""
+        if self.dashboard_active:
+            self._display_help_dashboard(category)
+        else:
+            self._display_help_traditional(category)
+
+    def _display_help_dashboard(self, category=None):
+        """Display help using dashboard panels"""
+        help_content = []
+        help_content.append(colored("╔═══════════════════════ COMMAND REFERENCE ═══════════════════════╗", 'cyan', attrs=['bold']))
+        help_content.append("")
+
+        categories = {
+            'Main': ['help', 'clear', 'exit', 'quit', 'banner', 'about', 'dashboard'],
+            'Interface': ['theme', 'style', 'animate', 'layout'],
+            'Target Management': ['target', 'showtarget', 'cleartarget'],
+            'Web Testing': ['webscan', 'dirscan', 'sqlmap', 'xsstest', 'csrftest', 'headerscan', 'sslscan', 'wafscan', 'cmsscan', 'apiscan', 'graphql', 'jwtscan', 'robots'],
+            'DNS & Subdomain': ['dnsenum', 'subdomain'],
+            'Web OSINT': ['emailharvest', 'metadata', 'techstack'],
+            'Reporting': ['results', 'report', 'export', 'history', 'compare'],
+            'Configuration': ['settings', 'proxy', 'threads', 'timeout', 'verbose', 'update'],
+            'Analytics': ['stats', 'timeline', 'performance', 'exportstats'],
+            'Advanced': ['script', 'schedule', 'monitor', 'honeypot', 'custom']
+        }
+
+        if category and category in categories:
+            # Show specific category
+            help_content.append(colored(f"  {category} Commands:", 'yellow', attrs=['bold']))
+            for cmd in categories[category]:
+                desc = self.commands.get(cmd, 'No description')
+                help_content.append(f"    {colored(cmd, 'green'):<20} - {colored(desc, 'white')}")
+        else:
+            # Show all categories
+            for cat_name, cmd_list in categories.items():
+                help_content.append(colored(f"  {cat_name}:", 'yellow', attrs=['bold']))
+                for cmd in cmd_list:
+                    desc = self.commands.get(cmd, 'No description')
+                    help_content.append(f"    {colored(cmd, 'green'):<20} - {colored(desc, 'white')}")
+                help_content.append("")
+
+        help_content.append(colored("╚════════════════════════════════════════════════════════════════╝", 'cyan', attrs=['bold']))
+
+        # Add to content history
+        self.content_history.extend(help_content)
+        self.render_dashboard()
+
+    def _display_help_traditional(self, category=None):
+        """Traditional help display for non-dashboard mode"""
         self.clear_screen()
         print(colored("\n╔═══════════════════════ COMMAND REFERENCE ═══════════════════════╗\n", 'cyan', attrs=['bold']))
 
         categories = {
-            'Main': ['help', 'clear', 'exit', 'quit', 'banner', 'about'],
+            'Main': ['help', 'clear', 'exit', 'quit', 'banner', 'about', 'dashboard'],
+            'Interface': ['theme', 'style', 'animate', 'layout'],
             'Target Management': ['target', 'showtarget', 'cleartarget'],
             'Web Testing': ['webscan', 'dirscan', 'sqlmap', 'xsstest', 'csrftest', 'headerscan', 'sslscan', 'wafscan', 'cmsscan', 'apiscan', 'graphql', 'jwtscan', 'robots'],
             'DNS & Subdomain': ['dnsenum', 'subdomain'],
