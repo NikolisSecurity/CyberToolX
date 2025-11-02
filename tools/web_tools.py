@@ -1,4 +1,8 @@
-"""Web application security testing tools"""
+"""Web application security testing tools
+
+Enhanced with advanced penetration testing modules for comprehensive
+web application security assessment.
+"""
 
 import requests
 import ssl
@@ -13,6 +17,20 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from utils.color_compat import colored
 from utils.ascii_art import AsciiArt
+
+# Import advanced testing modules
+try:
+    from tools.advanced_sql_injection import AdvancedSQLInjection
+    from tools.nosql_injection import NoSQLInjection
+    from tools.command_injection import CommandInjection
+    from tools.advanced_xss import AdvancedXSS
+    from tools.advanced_csrf import AdvancedCSRF
+    from tools.ssrf_testing import SSRFTesting
+    from tools.xxe_testing import XXETesting
+    from tools.api_enumerator import APIEnumerator
+    HAS_ADVANCED_MODULES = True
+except ImportError:
+    HAS_ADVANCED_MODULES = False
 
 # Optional OpenSSL import for advanced SSL features
 try:
