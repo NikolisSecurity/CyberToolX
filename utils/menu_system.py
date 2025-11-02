@@ -394,8 +394,13 @@ class MenuSystem:
             pass
 
     def display_prompt(self):
-        """Display command prompt"""
-        return colored('[>] ', 'green')
+        """Display command prompt with dashboard integration"""
+        if self.dashboard_active:
+            # Show prompt in dashboard context
+            target_display = self.current_target or "No Target"
+            return colored(f'cyber@nps [{target_display}] > ', 'tech_cyan')
+        else:
+            return colored('[>] ', 'green')
 
     def display_help(self, category=None):
         """Display help information"""
